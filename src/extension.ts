@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { registerInitCommand } from './commands/registerInitCommand';
+import registerDocsCommand from './commands/registerUploadCommand';
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('🟢 Extensão DeskHub ativada!');
   registerInitCommand(context);
+  registerDocsCommand(context);
 }
 
 export function deactivate() {}
