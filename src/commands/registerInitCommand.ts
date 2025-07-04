@@ -1,54 +1,94 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { MaestroConfig } from '../types/maestro-config';
+import os from 'os';
+import { IMaestroConfig } from '../interfaces/IMaestroConfig';
+import { postListMaestro } from '../api/http-post-list-maestro';
+import { IDataRequest } from '../interfaces/IDataRequest';
+import { RequestsValidatorsController } from '../Controller/RequestsValidatorsController';
 
-export async function registerInitCommand(context: vscode.ExtensionContext) {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0]; // Valida se tem alguma pasta aberta no vscode
+interface MaestroItem extends vscode.QuickPickItem {
+    key: string;
+}
 
-  if (!workspaceFolder) {
-    vscode.window.showWarningMessage('Nenhuma pasta foi aberta no VS Code.');
-    return;
-  }
+export function registerInitCommand(context: vscode.ExtensionContext) {
+    const command = vscode.commands.registerCommand('maestro.init', async () => {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        const validatorController = new RequestsValidatorsController();
 
-  const urlMaestro = await vscode.window.showInputBox({
-    prompt: "Digite a url PUT/POST do seu maestro:",
-    placeHolder: "https://abc12398soism.../?token=TOKEN",
-    ignoreFocusOut: false
-  });
-
-  if(!/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(urlMaestro)){
-    vscode.window.showErrorMessage("URL inválida, por gentileza, copie a URL correta do maestro.");
-    return;
-  }
-
-  const configPath = path.join(workspaceFolder.uri.fsPath, 'maestro.config.json');
-  const command = vscode.commands.registerCommand('maestro.init', () => {
-    if (fs.existsSync(configPath)) {
-      vscode.window.showWarningMessage('O arquivo maestro.config.json já existe.');
-      return;
-    }
-
-    const defaultConfig: MaestroConfig = {
-      name: 'Nome do maestro',
-      key: 'Chave interna do maestro',
-      prefixo: 'Prefixo do maestro',
-      author: "Nome do autor",
-      url_post: urlMaestro,
-      url_get: urlMaestro,
-      memoria: {
-        BEGIN_init: {},
-        CRON: {
-          access_token: "token de acesso a Desk Manager"
+        if (!workspaceFolder) {
+            vscode.window.showWarningMessage('Nenhuma pasta foi aberta no VS Code.');
+            return;
         }
-      },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
 
-    fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
-    vscode.window.showInformationMessage('✅ Arquivo maestro.config.json criado com sucesso!');
-  });
+        const token = await vscode.window.showInputBox({
+            prompt: "Informe o token (Authorization) do seu operador:",
+            ignoreFocusOut: false
+        });
 
-  context.subscriptions.push(command);
+        const urlPost = await vscode.window.showInputBox({
+            prompt: "Informe a URL POST do maestro:",
+            ignoreFocusOut: false
+        });
+        const dataRequest: IDataRequest = {
+            authorizationToken: token,
+            url: urlPost,
+            bodyList: {
+                Pesquisa: ""
+            }
+        };
+        const dataValidate = validatorController.valid("init", dataRequest);
+        if (!dataValidate.success) { return vscode.window.showWarningMessage(dataValidate.message);}
+        
+
+        // Substitua isso futuramente pelo await postListMaestro(dataRequest);
+        const maestroList = [
+            { Nome: "Maestro 1", Chave: "chave1" },
+            { Nome: "Maestro 2", Chave: "chave2" },
+        ];
+
+        const quickPickItems: MaestroItem[] = maestroList.map(item => ({
+            label: item.Nome,
+            description: `Chave interna: ${item.Chave}`,
+            key: item.Chave
+        }));
+
+        const maestroChoosed = await vscode.window.showQuickPick(quickPickItems, {
+            placeHolder: 'Escolha um Maestro para configurar'
+        });
+
+        if (!maestroChoosed) {
+            vscode.window.showWarningMessage('Nenhum maestro foi selecionado.');
+            return;
+        }
+
+        const configPath = path.join(workspaceFolder.uri.fsPath, 'maestro.config.json');
+
+        if (fs.existsSync(configPath)) {
+            vscode.window.showWarningMessage('O arquivo maestro.config.json já existe.');
+            return;
+        }
+
+        const defaultConfig: IMaestroConfig = {
+            name: maestroChoosed.label,
+            key: maestroChoosed.key,
+            prefixo: '', // Você pode pedir isso também, se quiser
+            author: os.hostname(),
+            url_post: urlPost,
+            url_get: '',
+            memoria: {
+                BEGIN_init: {},
+                CRON: {
+                    access_token: token
+                }
+            },
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
+        vscode.window.showInformationMessage('✅ Arquivo maestro.config.json criado com sucesso!');
+    });
+
+    context.subscriptions.push(command);
 }
