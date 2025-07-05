@@ -1,13 +1,15 @@
 export interface IMaestroConfig {
     name: string,
-    key: string,
+    key: number,
     prefixo: string,
     author: string,
     url_post: string,
     url_get: string,
+    publicKey?: string,
+    apiKey?: string,
     memoria: {
         BEGIN_init: {},
-        CRON: {
+        CRON?: {
             access_token: string
         }
     },

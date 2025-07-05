@@ -6,9 +6,9 @@ export interface IDataRequest {
     }
     bodyUpload?: {
         Chave: string
-        
     }
     bodyList?: {
-        Pesquisa: string
+        Pesquisa: string,
+        Ativo: string
     }
 }
