@@ -3,8 +3,9 @@ export interface IMaestroConfig {
     key: number,
     prefixo: string,
     author: string,
-    url_post: string,
-    url_get: string,
+    urlPost: string,
+    urlGet: string,
+    token_email: string
     publicKey?: string,
     apiKey?: string,
     memoria: {
@@ -13,6 +14,7 @@ export interface IMaestroConfig {
             access_token: string
         }
     },
+    pathMaestro: string,
     created_at: string,
     updated_at: string
 };

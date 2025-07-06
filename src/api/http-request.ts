@@ -27,15 +27,12 @@ export const apiDeskManager = async (
         if (!response.ok) {
             return messages.errors.http_list_maestro_fail;
         }
-
         const dataResponse = await response.json();
-
-        if ("error" in dataResponse) { return dataResponse.error; }
-        if ("erro" in dataResponse) { return dataResponse.erro; }
-
         return dataResponse;
 
     } catch (e) {
-        return messages.errors.http_list_maestro_exception.concat(`${e}`);
+        return {
+            erro: messages.errors.http_list_maestro_exception.concat(`${e}`)
+        };
     }
 };

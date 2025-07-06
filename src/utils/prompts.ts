@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IMaestroList } from '../interfaces/IMaestroList';
+import { IMaestroList } from '../interfaces/IMaestroRequests';
 
 // Método abaixo temporariamente indisponivel.
 export async function promptAuthorizationType(): Promise<string | undefined> {
