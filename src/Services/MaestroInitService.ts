@@ -52,7 +52,7 @@ export class MaestroInitService {
 
         dataRequest.bodyDownload.Chave = maestroChoosed.key.toString();
         const maestroChoice: IMaestroResponse = await apiDeskManager("Maestro", dataRequest.bodyDownload, dataRequest.authorizationToken);
-        const validationMaestroChoice = await validatorController.valid("maestrotfile", validationMaestroList);
+        const validationMaestroChoice = await validatorController.valid("maestrotfile", maestroChoice);
 
         if (!validationMaestroChoice.success) {
             vscode.window.showWarningMessage(validationMaestroChoice.message);

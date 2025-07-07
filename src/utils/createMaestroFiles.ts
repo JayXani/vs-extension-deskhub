@@ -15,7 +15,7 @@ export const createMaestroFiles = (basePath: string, maestroResponse: IMaestroRe
     const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
     const maestroConfig = maestroJSON.config;
     const fullPathMain = path.join(basePath, `Maestro: ${maestroResponse.TMaestro.Chave} - ${maestroResponse.TMaestro.Nome}`);
-    if (fs.existsSync(fullPathMain)) { return {errpr: "Maestro já configurado no ambiente"}; }
+    if (fs.existsSync(fullPathMain)) { return {error: "Maestro já configurado no ambiente"}; }
 
 
     const folderMain = fs.mkdirSync(fullPathMain, { recursive: true });

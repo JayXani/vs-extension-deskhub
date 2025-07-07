@@ -4,7 +4,6 @@ import { IMaestroResponse } from '../interfaces/IMaestroRequests';
 
 export function maestroFileWritter(configPath: string, maestroResponse: IMaestroResponse): boolean {
     if (fs.existsSync(configPath)) { return false; }
-    
     const fileConverted = createMaestroFiles(configPath, maestroResponse);
     if ("error" in fileConverted) { return false; }
 
