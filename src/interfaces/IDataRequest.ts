@@ -9,6 +9,7 @@ export interface IDataRequest {
     }
     bodyList?: {
         Pesquisa: string,
+        Tudo: string,
         Ativo: string
     }
 }

@@ -1,5 +1,6 @@
 import { IValidatorProcess } from "../interfaces/IValidatorProcess";
 import { Base64Validator } from "../Validators/Base64Validator";
+import { FolderValidator } from "../Validators/FolderValidator";
 import { MaestroListValidator } from "../Validators/MaestroListValidator";
 import { RequestValidator } from "../Validators/RequestValidator";
 
@@ -23,6 +24,9 @@ export class RequestsValidatorsController {
         ]);
         this.validatorMapper.set("maestrotfile", [
             new Base64Validator()
+        ]);
+        this.validatorMapper.set("folder_to_save", [
+            new FolderValidator()
         ]);
     }
 }

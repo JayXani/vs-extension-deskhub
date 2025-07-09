@@ -1,42 +1,105 @@
-import { IMaestroFile } from "../interfaces/IMaestroFile";
+import { IMaestroFile, IMaestroTree } from "../interfaces/IMaestroFile";
 import { IMaestroResponse } from "../interfaces/IMaestroRequests";
 import { convertBase64 } from "./convertBase64";
 import * as path from 'path';
 import * as fs from 'fs';
+import { createContentJsonata } from "./createScriptToJsonata";
+import { RequestsValidatorsController } from "../Controller/RequestsValidatorsController";
+import { IPathValidation } from "../interfaces/IPathValidation";
 
-export const createMaestroFiles = (basePath: string, maestroResponse: IMaestroResponse) => {
+export const createMaestroFiles = async (basePath: string, maestroResponse: IMaestroResponse) => {
+    const validator = new RequestsValidatorsController();
+
     const stringConverted = convertBase64(maestroResponse.TMaestro.Fluxo);
     if (stringConverted.error) {
         return {
-            error: stringConverted.error
+            success: false,
+            message: stringConverted.error,
+            path: ""
+        };
+    }
+    const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
+    const maestroConfig = maestroJSON.config;
+    const configMap = new Map<string, IMaestroTree>();
+    const tree = maestroJSON.tree.split(";").map((t) => t.split("."));
+    const maestroName = maestroResponse.TMaestro.Nome;
+    const maestroKey = maestroResponse.TMaestro.Chave.toString();
+    const fullPathMain = path.join(basePath, `Maestro - ${maestroKey} - ${maestroName}`);
+    const pathValidation: IPathValidation = {
+        basePath: basePath,
+        fullPathMaestro: fullPathMain,
+        keyMaestro: maestroKey
+    };
+    const foldersIsValid = await validator.valid("folder_to_save", pathValidation); //Realiza toda a validação das pastas antes de realizar a criação do maestro
+    if (!foldersIsValid.success) {
+        return {
+            path: "",
+            ...foldersIsValid
         };
     }
 
-    const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
-    const maestroConfig = maestroJSON.config;
-    const fullPathMain = path.join(basePath, `Maestro: ${maestroResponse.TMaestro.Chave} - ${maestroResponse.TMaestro.Nome}`);
-    if (fs.existsSync(fullPathMain)) { return {error: "Maestro já configurado no ambiente"}; }
+    maestroConfig.forEach((cfg) => configMap.set(cfg.name, cfg));
 
+    fs.mkdirSync(fullPathMain, { recursive: true });
+    for (const pathTree of tree) {
+        let currentPath = fullPathMain;
+        for (const part of pathTree) {
+            currentPath = path.join(currentPath, part);
+            if (!fs.existsSync(currentPath)) { fs.mkdirSync(currentPath, { recursive: true }); }
+            const config = configMap.get(part);
 
-    const folderMain = fs.mkdirSync(fullPathMain, { recursive: true });
-    for (const index in Object.entries(maestroConfig)) {
-        const config = maestroConfig[index];
-        const fileName = config.name.toLowerCase().trim();
-        if (fileName === "begin_init") {
-            const beginInitPath = path.join(folderMain, "BEGIN_init.json");
-            fs.writeFileSync(beginInitPath, JSON.stringify(config.response_model, null, 2), { encoding: "utf-8" });
-        }
-        if (fileName.includes("parse_")) { // DAR Continuidade a lógica
-
-            const typeFile = config.jsonata.toLowerCase().startsWith("#python") ? "py" : config.jsonata.startsWith("<!doctype html>") ? "html" : "txt";
-            const folderFile = fs.mkdirSync(path.join(folderMain, `${fileName}`), { recursive: true });
-            const pathFile = path.join(folderFile, `${fileName}.${typeFile}`);
-            const pathResponseModel = path.join(folderFile, `${fileName}.responsemodel.json`);
-            fs.writeFileSync(pathFile, config.jsonata);
-            fs.writeFileSync(pathResponseModel, JSON.stringify(config.response_model));
+            if (config && !config._written) {
+                config._written = true; //Garante que as pastas não sejam criadas duplicadas, garantindo unicidade
+                if (config.jsonata) {
+                    const content = config.jsonata;
+                    if (!content.toLowerCase().startsWith("#python") && !content.toLowerCase().startsWith("<!doctype html>")) {
+                        const scriptJS = createContentJsonata(content);
+                        const filePath = path.join(currentPath, `${part}.js`);
+                        fs.writeFileSync(filePath, scriptJS, { encoding: "utf-8" });
+                        continue;
+                    }
+                    const extension = content.toLowerCase().startsWith("#python") ? "py" : content.startsWith("<!doctype html>") ? "html" : "json";
+                    const filePath = path.join(currentPath, `${part}.${extension}`);
+                    fs.writeFileSync(filePath, content, { encoding: "utf-8" });
+                }
+                if (config.statement && config.delay) {
+                    const filePath = path.join(currentPath, `${part}.loop.json`);
+                    fs.writeFileSync(filePath, JSON.stringify({
+                        delay: config.delay,
+                        statement: config.statement
+                    }), { encoding: "utf-8" });
+                    continue;
+                }
+                if (config.statement) {
+                    const filePath = path.join(currentPath, `${part}.statement.json`);
+                    fs.writeFileSync(filePath, JSON.stringify({
+                        statement: config.statement
+                    }), { encoding: "utf-8" });
+                    continue;
+                }
+                if (config.return) {
+                    const returnValue = config.return;
+                    const filePath = path.join(currentPath, `${part}.return.json`);
+                    fs.writeFileSync(filePath, JSON.stringify({
+                        return: returnValue
+                    }), { encoding: "utf-8" });
+                }
+                if (config.response_model) {
+                    const filePath = path.join(currentPath, `${part}.responsemodel.json`);
+                    fs.writeFileSync(filePath, JSON.stringify(config.response_model), { encoding: "utf-8" });
+                }
+                if (config.request) {
+                    const filePath = path.join(currentPath, `${part}.http.json`);
+                    fs.writeFileSync(filePath, JSON.stringify({
+                        request: config.request
+                    }), { encoding: "utf-8" });
+                }
+            }
         }
     }
     return {
-        success: "Arquivos criados com sucesso."
+        success: true,
+        message: "Pastas criadas com sucesso",
+        path: fullPathMain
     };
 };

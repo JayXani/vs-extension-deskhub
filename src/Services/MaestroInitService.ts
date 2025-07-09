@@ -9,7 +9,7 @@ import { saveMaestroConfig } from '../utils/maestroFileWritterConfig';
 import { apiDeskManager } from '../api/http-request';
 import { extractPrefixFromUrl } from '../utils/getPrefixo';
 import { IMaestroResponse, IMaestroList } from '../interfaces/IMaestroRequests';
-import { maestroFileWritter } from '../utils/maestroFileWritter';
+import { createMaestroFiles } from '../utils/createMaestroFiles';
 
 export class MaestroInitService {
     async run(workspacePath: string) {
@@ -21,6 +21,7 @@ export class MaestroInitService {
             url: "",
             bodyList: {
                 Pesquisa: "",
+                Tudo: "true",
                 Ativo: "1"
             },
             bodyDownload: {
@@ -70,7 +71,6 @@ export class MaestroInitService {
             publicKey: '',
             apiKey: '',
             memoria: {
-                BEGIN_init: {},
                 CRON: {
                     access_token: token
                 }
@@ -80,12 +80,14 @@ export class MaestroInitService {
             updated_at: new Date().toISOString()
         };
 
-        config.pathMaestro = path.join(workspacePath, config.name);
-        const configPath = path.join(config.pathMaestro, 'maestro.config.json'); // Cria o arquivo dentro do próprio diretório do maestro.
-        if (!maestroFileWritter(config.pathMaestro, maestroChoice)) {
-            vscode.window.showWarningMessage("Ocorreu um erro durante a criação dos arquivos do maestro.");
+        const filesCreated = await createMaestroFiles(workspacePath, maestroChoice);
+        if (!filesCreated.success) {
+            vscode.window.showWarningMessage(filesCreated.message);
             return;
         }
+        const configPath = path.join(filesCreated.path, 'maestro.config.json'); // Cria o arquivo dentro do próprio diretório do maestro.
+        config.pathMaestro = filesCreated.path;
+
         if (!saveMaestroConfig(configPath, config)) {
             vscode.window.showWarningMessage("O arquivo maestro.config.json já existe.");
             return;

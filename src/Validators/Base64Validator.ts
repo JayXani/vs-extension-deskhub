@@ -5,7 +5,6 @@ import { messages } from "../utils/messages";
 export class Base64Validator implements IValidatorProcess {
     process(maestroResponse: IMaestroResponse): { success: boolean; message: string; } {
         try {
-            console.log(maestroResponse)
             const regexBase64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
             if (!maestroResponse.TMaestro.Fluxo || typeof maestroResponse.TMaestro.Fluxo !== "string") {
                 return {

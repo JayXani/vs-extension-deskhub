@@ -9,7 +9,6 @@ export interface IMaestroConfig {
     publicKey?: string,
     apiKey?: string,
     memoria: {
-        BEGIN_init: {},
         CRON?: {
             access_token: string
         }
