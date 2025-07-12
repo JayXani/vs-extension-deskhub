@@ -10,7 +10,7 @@ export function registerInitCommand(context: vscode.ExtensionContext) {
         }
 
         const service = new MaestroInitService();
-        await service.run(workspaceFolder.uri.fsPath);
+        await service.run(workspaceFolder.uri.fsPath, vscode);
     });
 
     context.subscriptions.push(command);

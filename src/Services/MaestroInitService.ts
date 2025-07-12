@@ -2,7 +2,6 @@ import * as os from 'os';
 import * as path from 'path';
 import { IMaestroConfig } from '../interfaces/IMaestroConfig';
 import { IDataRequest } from '../interfaces/IDataRequest';
-import * as vscode from 'vscode';
 import { RequestsValidatorsController } from '../Controller/RequestsValidatorsController';
 import { promptGetToken, promptMaestro } from '../utils/prompts';
 import { saveMaestroConfig } from '../utils/maestroFileWritterConfig';
@@ -10,11 +9,12 @@ import { apiDeskManager } from '../api/http-request';
 import { extractPrefixFromUrl } from '../utils/getPrefixo';
 import { IMaestroResponse, IMaestroList } from '../interfaces/IMaestroRequests';
 import { createMaestroFiles } from '../utils/createMaestroFiles';
+import { showMessage } from '../utils/showMessage';
 
 export class MaestroInitService {
-    async run(workspacePath: string) {
+    async run(workspacePath: string, vscode: any) {
         const validatorController = new RequestsValidatorsController();
-        const token = await promptGetToken();
+        const token = await promptGetToken(vscode);
 
         const dataRequest: IDataRequest = {
             authorizationToken: token,
@@ -29,36 +29,23 @@ export class MaestroInitService {
             }
         };
         const validation = await validatorController.valid("init", dataRequest);
-        if (!validation.success) {
-            vscode.window.showWarningMessage(validation.message);
-            return;
-        }
-
-        vscode.window.showInformationMessage("Aguarde enquanto realizamos a busca na lista de maestros...");
+        if (!validation.success) { return showMessage("warning", validation.message, vscode); }
+        showMessage("information", "Aguarde enquanto realizamos a busca na lista de maestros...", vscode);
 
         const maestroList: IMaestroList = await apiDeskManager("Maestro/lista", dataRequest.bodyList, dataRequest.authorizationToken);
         const validationMaestroList = await validatorController.valid('maestrolist', maestroList);
-        if (!validationMaestroList.success) {
-            vscode.window.showWarningMessage(validationMaestroList.message);
-            return;
-        }
+        if (!validationMaestroList.success) { return showMessage("warning", validationMaestroList.message, vscode); }
 
-        const maestroChoosed = await promptMaestro(maestroList);
-        if (!maestroChoosed) {
-            vscode.window.showWarningMessage("Nenhum maestro selecionado.");
-            return;
-        }
+        const maestroChoosed = await promptMaestro(maestroList, vscode);
+        if (!maestroChoosed) { return showMessage("warning", "Nenhum maestro selecionado.", vscode); }
 
-        vscode.window.showInformationMessage("Aguarde enquanto buscamos pelo seu maestro...");
-
+        showMessage("information", "Aguarde enquanto buscamos pelo seu maestro...", vscode);
+  
         dataRequest.bodyDownload.Chave = maestroChoosed.key.toString();
         const maestroChoice: IMaestroResponse = await apiDeskManager("Maestro", dataRequest.bodyDownload, dataRequest.authorizationToken);
         const validationMaestroChoice = await validatorController.valid("maestrotfile", maestroChoice);
 
-        if (!validationMaestroChoice.success) {
-            vscode.window.showWarningMessage(validationMaestroChoice.message);
-            return;
-        }
+        if (!validationMaestroChoice.success) { return showMessage("warning", validationMaestroChoice.message, vscode); }
 
         const config: IMaestroConfig = {
             name: maestroChoosed.label,
@@ -76,22 +63,19 @@ export class MaestroInitService {
                 }
             },
             pathMaestro: "",
+            tree: [],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
 
         const filesCreated = await createMaestroFiles(workspacePath, maestroChoice);
-        if (!filesCreated.success) {
-            vscode.window.showWarningMessage(filesCreated.message);
-            return;
-        }
+        if (!filesCreated.success) { return showMessage("warning", filesCreated.message, vscode); }
+
         const configPath = path.join(filesCreated.path, 'maestro.config.json'); // Cria o arquivo dentro do próprio diretório do maestro.
         config.pathMaestro = filesCreated.path;
+        config.tree = filesCreated.tree.split(";").map((t) => t.split("."));
 
-        if (!saveMaestroConfig(configPath, config)) {
-            vscode.window.showWarningMessage("O arquivo maestro.config.json já existe.");
-            return;
-        }
-        vscode.window.showInformationMessage('✅ Arquivo maestro.config.json criado com sucesso!');
+        if (!saveMaestroConfig(configPath, config)) { return showMessage("warning", "O arquivo maestro.config.json já existe.", vscode); }
+        showMessage("information", '✅ Arquivo maestro.config.json criado com sucesso!', vscode);
     }
 }

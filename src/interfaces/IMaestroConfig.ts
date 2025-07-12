@@ -13,6 +13,7 @@ export interface IMaestroConfig {
             access_token: string
         }
     },
+    tree: string[][],
     pathMaestro: string,
     created_at: string,
     updated_at: string

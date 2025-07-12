@@ -15,7 +15,8 @@ export const createMaestroFiles = async (basePath: string, maestroResponse: IMae
         return {
             success: false,
             message: stringConverted.error,
-            path: ""
+            path: "",
+            tree: ""
         };
     }
     const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
@@ -100,6 +101,7 @@ export const createMaestroFiles = async (basePath: string, maestroResponse: IMae
     return {
         success: true,
         message: "Pastas criadas com sucesso",
-        path: fullPathMain
+        path: fullPathMain,
+        tree: maestroJSON.tree
     };
 };
