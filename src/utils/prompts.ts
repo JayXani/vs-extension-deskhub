@@ -49,3 +49,21 @@ export async function promptMaestro(maestroList: IMaestroList, vscode: any) {
         key: choose
     };
 }
+
+export async function promptGetKey(vscode: any) {
+    if (vscode) {
+        return vscode.window.showInputBox({
+            prompt: "Informe a chave do maestro que deseja realizar o upload:",
+            ignoreFocusOut: false
+        });
+    }
+    const prompt = inquirer.createPromptModule();
+    const { keyMaestro } = await prompt([
+        {
+            type: "input",
+            name: "keyMaestro",
+            message: "🔎 Informe a chave do maestro que deseja realizar o upload:"
+        }
+    ]);
+    return keyMaestro;
+}

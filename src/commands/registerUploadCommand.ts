@@ -1,14 +1,18 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
+import { MaestroUploadService } from '../Services/MaestroUploadService';
 
-const registerDocsCommand = (context: vscode.ExtensionContext) => {
-    const workspace = vscode.workspace.workspaceFile?.[0];
-    if (!workspace) {
-        vscode.window.showInformationMessage('Nenhuma pasta foi aberta no VS Code.');
-        return;
-    }
+const registerUploadCommand = async (context: vscode.ExtensionContext) => {
+    const command = vscode.commands.registerCommand("maestro.upload", async () => {
+        const workspace = vscode.workspace.workspaceFolders?.[0];
+        if (!workspace) {
+            vscode.window.showInformationMessage('Nenhuma pasta foi aberta no VS Code.');
+            return;
+        }
+        const maestroUpload = new MaestroUploadService();
+        await maestroUpload.run(workspace.uri.fsPath, vscode);
+    });
 
+    context.subscriptions.push(command);
 };
 
-export default registerDocsCommand;
+export default registerUploadCommand;

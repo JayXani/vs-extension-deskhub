@@ -14,17 +14,17 @@
   ],
   "main": "./out/src/extension.js",
   "bin": {
-    "deskhub": "./out/bin/deskhub-maestro.js"
+    "maestro": "./out/bin/deskhub-maestro.js" 
   },
   "contributes": {
     "commands": [
       {
         "command": "maestro.init",
-        "title": "Deskhub: Init"
+        "title": "Maestro: Init"
       },
       {
         "command": "maestro.upload",
-        "title": "Deskhub: Upload maestro"
+        "title": "Maestro: Upload maestro"
       }
     ]
   },
