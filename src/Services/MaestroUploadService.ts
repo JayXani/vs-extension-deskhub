@@ -1,15 +1,17 @@
 import { RequestsValidatorsController } from "../Controller/RequestsValidatorsController";
 import { IDataRequest } from "../interfaces/IDataRequest";
+import { builderMaestroJSON } from "../utils/builderMaestroJSON";
 import { messages } from "../utils/messages";
 import { promptGetKey, promptGetToken } from "../utils/prompts";
+import { searchMaestro } from "../utils/searchMaestro";
 import { showMessage } from "../utils/showMessage";
 
 export class MaestroUploadService {
     async run(workspacePath: string, vscode: any) {
         try {
+            console.log(workspacePath);
             const validator = new RequestsValidatorsController();
             const token = await promptGetToken(vscode);
-
             const dataRequest: IDataRequest = {
                 authorizationToken: token,
                 url: "",
@@ -27,6 +29,17 @@ export class MaestroUploadService {
                 return showMessage("warning", informationMaestroValidated.message, vscode);
             }
             const keyMaestro = await promptGetKey(vscode);
+            showMessage("information", "Aguarde enquanto buscamos pelo maestro...", vscode);
+
+            const maestroFound = searchMaestro(keyMaestro, workspacePath);
+
+            if (!maestroFound.success) {
+                showMessage("warning", maestroFound.message, vscode);
+                return;
+            }
+            showMessage("information", "Maestro encontrado, realizando o upload...", vscode);
+            const maestroConverted = builderMaestroJSON(maestroFound.path);
+            
         } catch (e) {
             return showMessage("warning", `${messages.errors.folder_exception.concat(e)}`, vscode);
         }

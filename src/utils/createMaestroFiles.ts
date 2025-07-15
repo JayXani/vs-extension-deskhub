@@ -1,6 +1,6 @@
 import { IMaestroFile, IMaestroTree } from "../interfaces/IMaestroFile";
 import { IMaestroResponse } from "../interfaces/IMaestroRequests";
-import { convertBase64 } from "./convertBase64";
+import { decodeBase64 } from "./decodeBase64";
 import * as path from 'path';
 import * as fs from 'fs';
 import { createContentJsonata } from "./createScriptToJsonata";
@@ -10,7 +10,7 @@ import { IPathValidation } from "../interfaces/IPathValidation";
 export const createMaestroFiles = async (basePath: string, maestroResponse: IMaestroResponse) => {
     const validator = new RequestsValidatorsController();
 
-    const stringConverted = convertBase64(maestroResponse.TMaestro.Fluxo);
+    const stringConverted = decodeBase64(maestroResponse.TMaestro.Fluxo);
     if (stringConverted.error) {
         return {
             success: false,

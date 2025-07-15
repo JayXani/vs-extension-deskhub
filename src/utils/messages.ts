@@ -11,7 +11,8 @@ export const messages = {
         http_maestro_response_error: "ERRO: ",
         string_is_not_base64: "ATENÇÃO! A String informada não é um base64.",
         folder_exists: "ATENÇÃO! Já existe uma pasta com: ",
-        folder_exception: "ATENÇÃO! Uma excessão foi levantada durante a validação das pastas."
+        folder_exception: "ATENÇÃO! Uma excessão foi levantada durante a validação das pastas.",
+        folder_not_found: "ATENÇÃO !\n\nNão encontramos nenhuma pasta com a chave correspondente"
     },
     success: {
         validation_request: "Sucesso !\n\nDados para requisição validados.",
