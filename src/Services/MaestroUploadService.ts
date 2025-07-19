@@ -9,7 +9,6 @@ import { showMessage } from "../utils/showMessage";
 export class MaestroUploadService {
     async run(workspacePath: string, vscode: any) {
         try {
-            console.log(workspacePath);
             const validator = new RequestsValidatorsController();
             const token = await promptGetToken(vscode);
             const dataRequest: IDataRequest = {

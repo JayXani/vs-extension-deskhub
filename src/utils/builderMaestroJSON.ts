@@ -22,7 +22,7 @@ export const builderMaestroJSON = (basePath: string) => {
                 // Arquivos .json
                 if (ext === '.json') {
                     const content = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
-
+                    
                     if (lower.includes("begin_init")) {
                         maestroConfig.config.push({ name, response_model: content });
                     } else if (lower.includes("if_")) {

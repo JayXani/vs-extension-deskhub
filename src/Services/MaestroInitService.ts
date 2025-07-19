@@ -3,13 +3,14 @@ import * as path from 'path';
 import { IMaestroConfig } from '../interfaces/IMaestroConfig';
 import { IDataRequest } from '../interfaces/IDataRequest';
 import { RequestsValidatorsController } from '../Controller/RequestsValidatorsController';
-import { promptGetToken, promptMaestro } from '../utils/prompts';
+import { promptConstructorMaestro, promptGetToken, promptMaestro } from '../utils/prompts';
 import { saveMaestroConfig } from '../utils/maestroFileWritterConfig';
 import { apiDeskManager } from '../api/http-request';
 import { extractPrefixFromUrl } from '../utils/getPrefixo';
 import { IMaestroResponse, IMaestroList } from '../interfaces/IMaestroRequests';
 import { createMaestroFiles } from '../utils/createMaestroFiles';
 import { showMessage } from '../utils/showMessage';
+import { createMaestroFilesPy } from '../utils/createMaestroFilesPy';
 
 export class MaestroInitService {
     async run(workspacePath: string, vscode: any) {
@@ -40,7 +41,7 @@ export class MaestroInitService {
         if (!maestroChoosed) { return showMessage("warning", "Nenhum maestro selecionado.", vscode); }
 
         showMessage("information", "Aguarde enquanto buscamos pelo seu maestro...", vscode);
-  
+
         dataRequest.bodyDownload.Chave = maestroChoosed.key.toString();
         const maestroChoice: IMaestroResponse = await apiDeskManager("Maestro", dataRequest.bodyDownload, dataRequest.authorizationToken);
         const validationMaestroChoice = await validatorController.valid("maestrotfile", maestroChoice);
@@ -59,7 +60,7 @@ export class MaestroInitService {
             apiKey: '',
             memoria: {
                 CRON: {
-                    access_token: token
+                    access_token: JSON.parse(token)
                 }
             },
             pathMaestro: "",
@@ -68,7 +69,9 @@ export class MaestroInitService {
             updated_at: new Date().toISOString()
         };
 
-        const filesCreated = await createMaestroFiles(workspacePath, maestroChoice);
+        const option = await promptConstructorMaestro(vscode);
+    
+        const filesCreated = option === 1 ? await createMaestroFiles(workspacePath, maestroChoice) : await createMaestroFilesPy(workspacePath, maestroChoice);
         if (!filesCreated.success) { return showMessage("warning", filesCreated.message, vscode); }
 
         const configPath = path.join(filesCreated.path, 'maestro.config.json'); // Cria o arquivo dentro do próprio diretório do maestro.

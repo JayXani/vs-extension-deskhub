@@ -14,7 +14,7 @@
   ],
   "main": "./out/src/extension.js",
   "bin": {
-    "maestro": "./out/bin/deskhub-maestro.js" 
+    "maestro": "./out/bin/deskhub-maestro.js"
   },
   "contributes": {
     "commands": [
@@ -25,6 +25,10 @@
       {
         "command": "maestro.upload",
         "title": "Maestro: Upload maestro"
+      },
+      {
+        "command": "maestro.tree",
+        "title": "Maestro: Visualizar fluxo do maestro"
       }
     ]
   },
