@@ -1,20 +1,28 @@
-
 import * as path from 'path';
 import * as fs from 'fs';
-
 
 export function getTreeHtml(rootPath: string): string {
   function walk(dir: string): string {
     const items = fs.readdirSync(dir, { withFileTypes: true });
+    if (items.length === 0) {return '';}
 
-    let html = `<ul>`;
+    let html = '<div class="tree-level">';
+
     for (const item of items) {
       if (item.isDirectory()) {
         const subDir = path.join(dir, item.name);
-        html += `<li><span>${item.name}</span>${walk(subDir)}</li>`;
+        const children = walk(subDir);
+
+        html += `
+          <div class="tree-node">
+            <div class="node">${item.name}</div>
+            ${children ? `<div class="tree-branch">${children}</div>` : ''}
+          </div>
+        `;
       }
     }
-    html += `</ul>`;
+
+    html += '</div>';
     return html;
   }
 
@@ -23,27 +31,211 @@ export function getTreeHtml(rootPath: string): string {
     <html lang="pt-BR">
     <head>
       <meta charset="UTF-8">
+      <title>Árvore Visual com Linhas</title>
       <style>
-        ul {
-          list-style-type: none;
-          padding-left: 20px;
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          padding: 2rem;
+          background: #fff;
+          font-family: sans-serif;
         }
-        li {
-          margin: 4px 0;
+
+        .tree-wrapper {
+          position: relative;
+          overflow-x: auto;
         }
-        span {
+
+        .tree-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+          z-index: 1;
+        }
+
+        .node {
+          background: #668cd8ff;
+          border: 1px solid #ccc;
+          padding: 12px 16px;
+          border-radius: 6px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          text-align: center;
+          min-width: 140px;
+          max-width: 180px;
+          font-size: 14px;
+          position: relative;
           cursor: pointer;
-          color: #3794ff;
         }
-        span:hover {
-          text-decoration: underline;
+
+        .tree-level {
+          display: flex;
+          justify-content: center;
+          gap: 80px; /* espaçamento horizontal entre blocos */
+          margin: 50px 0;
+          flex-wrap: nowrap; /* importante para alinhar horizontalmente sem quebra */
+          position: relative;
+          z-index: 2;
+        }
+
+        .icon {
+          font-size: 16px;
+          margin-bottom: 4px;
+        }
+
+        .node:hover {
+          background: #a3c1e8ff;
+        }
+
+        svg.lines {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        line.connector {
+          stroke: #ccc;
+          stroke-width: 2;
         }
       </style>
     </head>
     <body>
-      <h2>Árvore de Pastas</h2>
-      ${walk(rootPath)}
+      <div class="tree-wrapper">
+        <svg class="lines"></svg>
+        <div class="tree-container" id="tree"></div>
+      </div>
+
+      <script>
+        const tree = [
+          ["init"],
+          ["init", "Traduction modals"],
+          ["init", "Traduction modals", "Open Second modal"],
+          ["init", "Traduction modals", "Open Second modal", "Is Quality Analisty"],
+          ["init", "Traduction modals", "Open Second modal", "Is Quality Analisty", "Open form"],
+          ["init", "Traduction modals", "Open Second modal", "Is Quality Analisty", "Open form", "Form to finish"],
+          ["init", "Traduction modals", "Open Second modal", "Is Quality Analisty", "Open trigger fields", "Fields inputs"],
+          ["init", "Traduction modals", "Open Second modal", "Is Quality Analisty", "Has error in parse", "Error message in modal"],
+          ["init", "Traduction modals", "Open modal without machine or purchase"],
+          ["init", "Traduction modals", "Open modal without machine or purchase", "GET Machines and Models", "Modal of choose machine and models"],
+          ["init", "Traduction modals", "Finish Ticket", "Ticket Finished", "Final message"],
+        ];
+
+        const icons = {
+          init: "🏁",
+          "Traduction modals": "▶️",
+          "Open Second modal": "⬇️",
+          "Open modal without machine or purchase": "⬇️",
+          "Finish Ticket": "⬇️",
+          "Is Quality Analisty": "🧪",
+          "Open form": "⬇️",
+          "Form to finish": "🧪",
+          "Open trigger fields": "⬇️",
+          "Fields inputs": "🧪",
+          "Has error in parse": "⬇️",
+          "Error message in modal": "🧪",
+          "GET Machines and Models": "🧪",
+          "Modal of choose machine and models": "🧪",
+          "Ticket Finished": "🧪",
+          "Final message": "🧪",
+        };
+
+        const treeContainer = document.getElementById("tree");
+        const svg = document.querySelector("svg.lines");
+
+        const levels = {};
+
+        tree.forEach(path => {
+          path.forEach((node, i) => {
+            if (!levels[i]) levels[i] = [];
+            if (!levels[i].includes(node)) levels[i].push(node);
+          });
+        });
+
+        const nodeRefs = {}; // Para conectar depois
+
+        Object.entries(levels).forEach(([levelIndex, nodes]) => {
+          const levelDiv = document.createElement("div");
+          levelDiv.className = "tree-level";
+
+          nodes.forEach(node => {
+            const div = document.createElement("div");
+            div.className = "node";
+            div.setAttribute("data-node", node);
+
+            const icon = document.createElement("span");
+            icon.className = "icon";
+            icon.innerText = icons[node] || "⬜";
+
+            const label = document.createElement("div");
+            label.innerText = node;
+
+            div.appendChild(icon);
+            div.appendChild(label);
+            levelDiv.appendChild(div);
+
+            nodeRefs[node] = div;
+          });
+
+          treeContainer.appendChild(levelDiv);
+        });
+
+        // Aguarda o render para calcular posições e desenhar linhas
+        setTimeout(() => {
+      tree.forEach(path => {
+        for (let i = 0; i < path.length - 1; i++) {
+          const fromNode = nodeRefs[path[i]];
+          const toNode = nodeRefs[path[i + 1]];
+          if (!fromNode || !toNode) continue;
+
+          const fromRect = fromNode.getBoundingClientRect();
+          const toRect = toNode.getBoundingClientRect();
+          const svgRect = svg.getBoundingClientRect();
+
+          const fromX = fromRect.left + fromRect.width / 2 - svgRect.left;
+          const fromY = fromRect.bottom - svgRect.top;
+
+          const toX = toRect.left + toRect.width / 2 - svgRect.left;
+          const toY = toRect.top - svgRect.top;
+
+          const midY = fromY + (toY - fromY) / 2;
+
+          // Linha vertical: do nó de origem até a metade
+          const vLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          vLine.setAttribute("x1", fromX);
+          vLine.setAttribute("y1", fromY);
+          vLine.setAttribute("x2", fromX);
+          vLine.setAttribute("y2", midY);
+          vLine.classList.add("connector");
+          svg.appendChild(vLine);
+
+          // Linha horizontal: da origem ao destino
+          const hLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          hLine.setAttribute("x1", fromX);
+          hLine.setAttribute("y1", midY);
+          hLine.setAttribute("x2", toX);
+          hLine.setAttribute("y2", midY);
+          hLine.classList.add("connector");
+          svg.appendChild(hLine);
+
+          // Linha vertical final: da metade até o destino
+          const vLine2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          vLine2.setAttribute("x1", toX);
+          vLine2.setAttribute("y1", midY);
+          vLine2.setAttribute("x2", toX);
+          vLine2.setAttribute("y2", toY);
+          vLine2.classList.add("connector");
+          svg.appendChild(vLine2);
+        }
+      });
+    }, 100);
+
+      </script>
     </body>
     </html>
+
   `;
 }

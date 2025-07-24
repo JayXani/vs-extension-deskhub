@@ -19,8 +19,7 @@ export function registerTreeCommand(context: vscode.ExtensionContext) {
         );
 
         const service = new MaestroConstructorFlux();
-        await service.run(workspaceFolder.uri.fsPath, vscode);
-        const treeHtml = getTreeHtml(workspaceFolder.uri.fsPath);
+        const treeHtml = await service.run(workspaceFolder.uri.fsPath, vscode);
         panel.webview.html = treeHtml;
     });
 
