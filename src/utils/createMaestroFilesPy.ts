@@ -14,6 +14,8 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
         return {
             success: false,
             message: stringConverted.error,
+            constants: [],
+            cron: [],
             path: "",
             tree: ""
         };
@@ -63,6 +65,8 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
     return {
         success: true,
         message: "Pastas criadas com sucesso",
+        constants: maestroJSON.constants,
+        cron: maestroJSON.cron,
         path: fullPathMain,
         tree: maestroJSON.tree
     };

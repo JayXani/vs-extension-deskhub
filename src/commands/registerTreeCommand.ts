@@ -9,7 +9,10 @@ export function registerTreeCommand(context: vscode.ExtensionContext) {
             vscode.window.showWarningMessage('Nenhuma pasta foi aberta no VS Code.');
             return;
         }
-        const panel = vscode.window.createWebviewPanel( // Essa função permite criar uma tela de visualizacao com base em um HTML
+
+        const service = new MaestroConstructorFlux();
+        const treeHtml = await service.run(workspaceFolder.uri.fsPath, vscode);
+                const panel = vscode.window.createWebviewPanel( // Essa função permite criar uma tela de visualizacao com base em um HTML
             'folderTree',
             'Árvore de Pastas', // Nome do arquivo que será aberto
             vscode.ViewColumn.One,
@@ -17,9 +20,6 @@ export function registerTreeCommand(context: vscode.ExtensionContext) {
                 enableScripts: true // Habilita que o HTML rode scripts
             }
         );
-
-        const service = new MaestroConstructorFlux();
-        const treeHtml = await service.run(workspaceFolder.uri.fsPath, vscode);
         panel.webview.html = treeHtml;
     });
 

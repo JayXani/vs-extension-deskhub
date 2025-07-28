@@ -14,6 +14,10 @@ export interface IMaestroConfig {
         }
     },
     tree: string[][],
+    files: Array<Object>,
+    constants: any[],
+    cron: any[],
+    autoBuilded: boolean,
     pathMaestro: string,
     created_at: string,
     updated_at: string

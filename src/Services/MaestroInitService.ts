@@ -3,12 +3,11 @@ import * as path from 'path';
 import { IMaestroConfig } from '../interfaces/IMaestroConfig';
 import { IDataRequest } from '../interfaces/IDataRequest';
 import { RequestsValidatorsController } from '../Controller/RequestsValidatorsController';
-import { promptConstructorMaestro, promptGetToken, promptMaestro } from '../utils/prompts';
+import { promptGetToken, promptMaestro } from '../utils/prompts';
 import { saveMaestroConfig } from '../utils/maestroFileWritterConfig';
 import { apiDeskManager } from '../api/http-request';
 import { extractPrefixFromUrl } from '../utils/getPrefixo';
 import { IMaestroResponse, IMaestroList } from '../interfaces/IMaestroRequests';
-import { createMaestroFiles } from '../utils/createMaestroFiles';
 import { showMessage } from '../utils/showMessage';
 import { createMaestroFilesPy } from '../utils/createMaestroFilesPy';
 
@@ -65,18 +64,23 @@ export class MaestroInitService {
             },
             pathMaestro: "",
             tree: [],
+            constants: [],
+            cron: [],
+            autoBuilded: false,
+            files: maestroChoice.TFiles.map((f) => f),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
 
-        const option = await promptConstructorMaestro(vscode);
-    
-        const filesCreated = option === 1 ? await createMaestroFiles(workspacePath, maestroChoice) : await createMaestroFilesPy(workspacePath, maestroChoice);
+        const filesCreated = await createMaestroFilesPy(workspacePath, maestroChoice);
         if (!filesCreated.success) { return showMessage("warning", filesCreated.message, vscode); }
 
         const configPath = path.join(filesCreated.path, 'maestro.config.json'); // Cria o arquivo dentro do próprio diretório do maestro.
+        
         config.pathMaestro = filesCreated.path;
         config.tree = filesCreated.tree.split(";").map((t) => t.split("."));
+        config.constants = filesCreated.constants;
+        config.cron = filesCreated.cron;
 
         if (!saveMaestroConfig(configPath, config)) { return showMessage("warning", "O arquivo maestro.config.json já existe.", vscode); }
         showMessage("information", '✅ Arquivo maestro.config.json criado com sucesso!', vscode);
