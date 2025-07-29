@@ -9,7 +9,7 @@ export interface IMaestroList {
             valor: number
         }
     ],
-    total: string
+    total?: string
 }
 
 export interface IMaestroResponse {

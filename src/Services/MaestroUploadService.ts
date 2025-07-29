@@ -1,9 +1,10 @@
 import { apiDeskManager } from "../api/http-request";
 import { RequestsValidatorsController } from "../Controller/RequestsValidatorsController";
 import { IDataRequest } from "../interfaces/IDataRequest";
+import { IMaestroList } from "../interfaces/IMaestroRequests";
 import { builderMaestroJSON } from "../utils/builderMaestroJSON";
 import { messages } from "../utils/messages";
-import { promptGetKey, promptGetToken } from "../utils/prompts";
+import { promptGetToken, promptMaestro } from "../utils/prompts";
 import { searchMaestroInFolder } from "../utils/searchMaestroInFolder";
 import { showMessage } from "../utils/showMessage";
 
@@ -28,26 +29,21 @@ export class MaestroUploadService {
             if (!informationMaestroValidated.success) {
                 return showMessage("warning", informationMaestroValidated.message, vscode);
             }
-            const keyMaestro = await promptGetKey(vscode);
             showMessage("information", "Aguarde enquanto buscamos pelo maestro...", vscode);
 
-            const maestroFound = searchMaestroInFolder(keyMaestro, workspacePath);
+            const maestrosFound = searchMaestroInFolder("MAESTRO", workspacePath);
+            if (!maestrosFound.success) { return showMessage("warning", maestrosFound.message, vscode); }
 
-            if (!maestroFound.success) {
-                showMessage("warning", maestroFound.message, vscode);
-                return;
-            }
+            const key = await promptMaestro(maestrosFound, vscode);
+            if (!key) { return showMessage('warning', messages.errors.http_maestro_not_found, vscode); }
+
             showMessage("information", "Maestro encontrado, realizando o upload...", vscode);
-            dataRequest.bodyDownload.Chave = keyMaestro;
+            dataRequest.bodyDownload.Chave = key;
 
             const searchMaestroInDesk = await apiDeskManager("Maestro", dataRequest.bodyDownload, dataRequest.authorizationToken);
-            if (!searchMaestroInDesk) {
-                showMessage("warning", messages.errors.http_maestro_not_found, vscode);
-                return;
-            }
-            //const maestroConverted = builderMaestroJSON(maestroFound.path);
-
-
+            if (!searchMaestroInDesk) { return showMessage("warning", messages.errors.http_maestro_not_found, vscode); }
+            
+            //const maestroBuilded = builderMaestroJSON()
         } catch (e) {
             return showMessage("warning", `${messages.errors.folder_exception.concat(e)}`, vscode);
         }

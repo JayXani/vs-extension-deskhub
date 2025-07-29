@@ -22,7 +22,7 @@ export async function promptGetToken(vscode: any): Promise<string | undefined> {
 }
 
 
-export async function promptMaestro(maestroList: IMaestroList, vscode: any) {
+export async function promptMaestro(maestroList: any, vscode: any) {
     if (vscode) {
         const quickPickItems = maestroList.root.map(item => ({
             label: item.Nome,

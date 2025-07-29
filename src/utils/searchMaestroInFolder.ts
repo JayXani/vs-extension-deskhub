@@ -5,45 +5,40 @@ import { messages } from './messages';
 export const searchMaestroInFolder = (key: string, basePath: string): {
     success: boolean;
     message: string;
-    path: string;
+    root: Array<Object>;
 } => {
 
-    const recursiveSearch = (dir: string): string | null => {
+    const searchMaestros = (dir: string) => {
         const entries = fs.readdirSync(dir, { withFileTypes: true });
+        const maestros = [];
 
         for (const entry of entries) {
             if (entry.isDirectory()) {
-                const currentPath = path.join(dir, entry.name);
-
-                // Verifica se o nome da pasta contém a chave
-                if (entry.name.includes(key)) {
-                    return currentPath;
-                }
-
-                // Chamada recursiva para procurar em subpastas
-                const result = recursiveSearch(currentPath);
-                if (result) {
-                    return result;
+                // Verifica se o nome da pasta contém o termo maestro 
+                if (entry.name.toUpperCase().includes(key)) {
+                    const key = entry.name.split("-");
+                    maestros.push({
+                        Nome: entry.name,
+                        Chave: key[1].trim()
+                    });
                 }
             }
         }
-
-        return null;
+        return maestros;
     };
 
-    const resultPath = recursiveSearch(basePath);
-
-    if (!resultPath) {
+    const result = searchMaestros(basePath);
+    if (!result) {
         return {
             success: false,
             message: messages.errors.folder_not_found,
-            path: ""
+            root: []
         };
     }
 
     return {
         success: true,
         message: "Pasta encontrada.",
-        path: resultPath
+        root: result
     };
 };

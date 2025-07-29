@@ -35,8 +35,9 @@ const changeFiles = (event: vscode.FileRenameEvent) => {
             const configContent = fs.readFileSync(configPath, 'utf-8');
             config = JSON.parse(configContent) as IMaestroConfig;
 
-            const oldName = oldPath.split("\\").pop();
-            const newName = newPath.split("\\").pop();
+            // Regex para splitar as barras no mac, windows e linux
+            const oldName = oldPath.split(/[/\\]/).pop();
+            const newName = newPath.split(/[/\\]/).pop();
 
             if (!oldName || !newName) { return; }
 
