@@ -63,6 +63,7 @@ export class MaestroInitService {
                 }
             },
             pathMaestro: "",
+            description: maestroChoice.TMaestro.Descricao,
             tree: [],
             constants: [],
             cron: [],

@@ -13,7 +13,7 @@ export const messages = {
         folder_exists: "ATENÇÃO! Já existe uma pasta com: ",
         folder_exception: "ATENÇÃO! Uma excessão foi levantada durante a validação das pastas.",
         folder_not_found: "ATENÇÃO !\n\nNão encontramos nenhuma pasta com a chave correspondente",
-        maestro_config_not_found: "ATENÇÃO !\n\nNão encontramos nenhum arquivo .json",
+        maestro_config_not_found: "ATENÇÃO !\n\nNão encontramos nenhum arquivo .json em:",
         maestro_config_not_loaded: "ERRO ! Não conseguimos realizar a leitura do arquivo JSON",
         maestro_config_array_invalid: "ATENÇÃO ! Não foi possível carregar o array da árvore do maestro" 
     },

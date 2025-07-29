@@ -13,6 +13,7 @@ export interface IMaestroConfig {
             access_token: string
         }
     },
+    description: string,
     tree: string[][],
     files: Array<Object>,
     constants: any[],

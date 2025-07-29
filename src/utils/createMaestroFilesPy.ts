@@ -55,7 +55,7 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
                     config._written = true; //Garante que as pastas não sejam criadas duplicadas, garantindo unicidade
                     if (config.jsonata) {
                         const content = config.jsonata;
-                        const filePath = path.join(currentPath, `${part}.py`);
+                        const filePath = path.join(currentPath, `${part.replace("PARSE_", "")}.py`);
                         fs.writeFileSync(filePath, content, { encoding: "utf-8" });
                     }
                 }
