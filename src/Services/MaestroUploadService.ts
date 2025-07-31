@@ -1,7 +1,7 @@
 import { apiDeskManager } from "../api/http-request";
 import { RequestsValidatorsController } from "../Controller/RequestsValidatorsController";
 import { IDataRequest } from "../interfaces/IDataRequest";
-import { IMaestroList } from "../interfaces/IMaestroRequests";
+import { IMaestroList, IMaestroResponse } from "../interfaces/IMaestroRequests";
 import { builderMaestroJSON } from "../utils/builderMaestroJSON";
 import { messages } from "../utils/messages";
 import { promptGetToken, promptMaestro } from "../utils/prompts";
@@ -40,9 +40,11 @@ export class MaestroUploadService {
             showMessage("information", "Maestro encontrado, realizando o upload...", vscode);
             dataRequest.bodyDownload.Chave = key;
 
-            const searchMaestroInDesk = await apiDeskManager("Maestro", dataRequest.bodyDownload, dataRequest.authorizationToken);
-            if (!searchMaestroInDesk) { return showMessage("warning", messages.errors.http_maestro_not_found, vscode); }
-            
+            const maestroDesk: IMaestroResponse = await apiDeskManager("Maestro", dataRequest.bodyDownload, dataRequest.authorizationToken);
+            if (!maestroDesk) { return showMessage("warning", messages.errors.http_maestro_not_found, vscode); }
+
+            const maestroConstructor = builderMaestroJSON(maestroDesk, workspacePath);
+
             //const maestroBuilded = builderMaestroJSON()
         } catch (e) {
             return showMessage("warning", `${messages.errors.folder_exception.concat(e)}`, vscode);

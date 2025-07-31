@@ -40,7 +40,7 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
         };
     }
 
-    maestroConfig.forEach((cfg) => configMap.set(cfg.name, cfg));
+    maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", ""), cfg));
 
     fs.mkdirSync(fullPathMain, { recursive: true });
     for (const pathTree of tree) {
