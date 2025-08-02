@@ -15,7 +15,8 @@ export const messages = {
         folder_not_found: "ATENÇÃO !\n\nNão encontramos nenhuma pasta com a chave correspondente",
         maestro_config_not_found: "ATENÇÃO !\n\nNão encontramos nenhum arquivo .json em:",
         maestro_config_not_loaded: "ERRO ! Não conseguimos realizar a leitura do arquivo JSON",
-        maestro_config_array_invalid: "ATENÇÃO ! Não foi possível carregar o array da árvore do maestro" 
+        maestro_config_array_invalid: "ATENÇÃO ! Não foi possível carregar o array da árvore do maestro",
+        maestro_listener_error: "ATENÇÃO ! Não foi possível realizar a sincronização com o maestro, por gentileza, valide se as chaves de API e ambiente estão corretas."
     },
     success: {
         validation_request: "Sucesso !\n\nDados para requisição validados.",
