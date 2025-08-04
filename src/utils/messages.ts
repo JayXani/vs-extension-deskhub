@@ -6,7 +6,7 @@ export const messages = {
         http_list_maestro_exception: "ATENÇÃO !\n\nUma excessão ocorreu durante o processo: ",
         http_url_cannot_be_empty: "ATENÇÃO !\n\nA URL informada não pode ser uma string vazia.",
         http_format_url_invalid: "ATENÇÃO !\n\nA URL informada não possui a formatação correta.",
-        http_token_cannot_be_empty: "ATENÇÃO !\n\nO token authorization não pode ser vazio.",
+        http_token_cannot_be_empty: "ATENÇÃO !\n\nCredencial não pode ser vazio.",
         http_maestro_not_found: "ATENÇÃO !\n\nNão encontramos nenhum maestro com as informações passadas.",
         http_maestro_response_error: "ERRO: ",
         string_is_not_base64: "ATENÇÃO! A String informada não é um base64.",
@@ -16,7 +16,8 @@ export const messages = {
         maestro_config_not_found: "ATENÇÃO !\n\nNão encontramos nenhum arquivo .json em:",
         maestro_config_not_loaded: "ERRO ! Não conseguimos realizar a leitura do arquivo JSON",
         maestro_config_array_invalid: "ATENÇÃO ! Não foi possível carregar o array da árvore do maestro",
-        maestro_listener_error: "ATENÇÃO ! Não foi possível realizar a sincronização com o maestro, por gentileza, valide se as chaves de API e ambiente estão corretas."
+        maestro_length_not_equal: "ATENÇÃO ! Não é possível realizar o upload pois o tamanho da arvore original é diferente do tamanho da arvore no maestro.config.",
+        maestro_name_rollback: "ATENÇÃO ! Não foi possível realizar a atualização do nome no maestro, portanto, alteramos o nome original do arquivo. Valide suas credenciais do ambiente."
     },
     success: {
         validation_request: "Sucesso !\n\nDados para requisição validados.",

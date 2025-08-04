@@ -67,3 +67,38 @@ export async function promptGetKey(vscode: any) {
     ]);
     return keyMaestro;
 }
+
+export async function promptPublicKey(vscode: any) {
+    if (vscode) {
+        return vscode.window.showInputBox({
+            prompt: "Informe a chave do ambiente:",
+            ignoreFocusOut: true,
+        });
+    }
+    const prompt = inquirer.createPromptModule();
+    const { publicKey } = await prompt([
+        {
+            type: "input",
+            name: "publicKey",
+            message: "🔎 Informe a chave do ambiente que deseja:"
+        }
+    ]);
+    return publicKey;
+}
+export async function promptApiKey(vscode: any) {
+    if (vscode) {
+        return vscode.window.showInputBox({
+            prompt: "Informe a chave do operador:",
+            ignoreFocusOut: true,
+        });
+    }
+    const prompt = inquirer.createPromptModule();
+    const { apiKey } = await prompt([
+        {
+            type: "input",
+            name: "apiKey",
+            message: "🔎 Informe a chave do operador:"
+        }
+    ]);
+    return apiKey;
+}

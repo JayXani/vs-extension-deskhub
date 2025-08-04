@@ -6,15 +6,9 @@ export interface IMaestroConfig {
     urlPost: string,
     urlGet: string,
     token_email: string
-    publicKey?: string,
-    apiKey?: string,
-    memoria: {
-        CRON?: {
-            access_token: string
-        }
-    },
+    publicKey: string,
+    apiKey: string,
     description: string,
-    tree: string[][],
     files: Array<Object>,
     constants: any[],
     cron: any[],

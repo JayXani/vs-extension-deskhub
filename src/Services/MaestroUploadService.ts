@@ -44,7 +44,7 @@ export class MaestroUploadService {
             if (!maestroDesk) { return showMessage("warning", messages.errors.http_maestro_not_found, vscode); }
 
             const maestroConstructor = builderMaestroJSON(maestroDesk, workspacePath);
-
+                
             //const maestroBuilded = builderMaestroJSON()
         } catch (e) {
             return showMessage("warning", `${messages.errors.folder_exception.concat(e)}`, vscode);

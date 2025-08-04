@@ -17,7 +17,6 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
             constants: [],
             cron: [],
             path: "",
-            tree: ""
         };
     }
     const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
@@ -40,18 +39,19 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
         };
     }
 
-    maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", ""), cfg));
+    maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", "").trim(), cfg));
 
     fs.mkdirSync(fullPathMain, { recursive: true });
     for (const pathTree of tree) {
         let currentPath = fullPathMain;
         for (const part of pathTree) {
-            const config = configMap.get(part);
-            if(config?.jsonata){
+            const partReplaced = part.replace("PARSE_", "").trim();
+            const config = configMap.get(partReplaced);
+            if (config?.jsonata) {
                 if (config && !config._written && config.jsonata.toLowerCase().startsWith("#python")) {
                     currentPath = path.join(currentPath, part);
                     if (!fs.existsSync(currentPath)) { fs.mkdirSync(currentPath, { recursive: true }); }
-    
+
                     config._written = true; //Garante que as pastas não sejam criadas duplicadas, garantindo unicidade
                     if (config.jsonata) {
                         const content = config.jsonata;
@@ -67,7 +67,6 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
         message: "Pastas criadas com sucesso",
         constants: maestroJSON.constants,
         cron: maestroJSON.cron,
-        path: fullPathMain,
-        tree: maestroJSON.tree
+        path: fullPathMain
     };
 };
