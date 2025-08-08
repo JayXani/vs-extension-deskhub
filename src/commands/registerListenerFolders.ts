@@ -4,12 +4,12 @@ import * as fs from 'fs';
 import { showMessage } from '../utils/showMessage';
 import { messages } from '../utils/messages';
 import { IMaestroConfig } from '../interfaces/IMaestroConfig';
-import { normalizeToUnderscore } from '../utils/normalizeString';
+import { escapeRegex } from '../utils/normalizeString';
 import { apiDeskManager } from '../api/http-request';
 import { IMaestroResponse } from '../interfaces/IMaestroRequests';
-import { IMaestroFile, IMaestroTree } from '../interfaces/IMaestroFile';
 import { decodeBase64 } from '../utils/decodeBase64';
 import { encodeBase64 } from '../utils/encondeBase64';
+import { RequestsValidatorsController } from '../Controller/RequestsValidatorsController';
 
 export function registerListenerFolder(context: vscode.ExtensionContext) {
     // Assiste arquivos .py
@@ -18,6 +18,7 @@ export function registerListenerFolder(context: vscode.ExtensionContext) {
 }
 
 const changeFiles = async (event: vscode.FileRenameEvent) => {
+    const validator = new RequestsValidatorsController();
     for (const file of event.files) {
         const oldPath = file.oldUri.fsPath;
         const newPath = file.newUri.fsPath;
@@ -29,57 +30,38 @@ const changeFiles = async (event: vscode.FileRenameEvent) => {
         if (!maestroDir) { continue; }
 
         const configPath = path.join(maestroDir, 'maestro.config.json');
-
-        if (!fs.existsSync(configPath)) {
-            showMessage("warning", messages.errors.maestro_config_not_found + maestroDir, vscode);
-            continue;
-        }
+        if (!fs.existsSync(configPath)) { throw new Error(messages.errors.maestro_config_not_found + maestroDir); }
         try {
             const configContent = fs.readFileSync(configPath, 'utf-8');
             const config: IMaestroConfig = JSON.parse(configContent) as IMaestroConfig;
             const token = await apiDeskManager("Login/autenticar", { PublicKey: config.publicKey }, config.apiKey);
 
             // Regex para splitar as barras no mac, windows e linux
-            const newName = newPath.split(/[/\\]/).pop();
+            const newName = newPath.split(/[/\\]/).pop().trim().replace(".py", "");
+            const oldName = oldPath.split(/[/\\]/).pop().trim().replace(".py", "");
+            const regex = new RegExp(escapeRegex(`${oldName}`), 'g');
 
             const maestro: IMaestroResponse = await apiDeskManager("Maestro", { Chave: config.key }, token);
-            if (!maestro || "erro" in maestro) {
-                fs.renameSync(newPath, oldPath);
-                return showMessage("error", messages.errors.maestro_name_rollback, vscode);
-            }
+            if (!maestro || "erro" in maestro) { throw new Error(messages.errors.maestro_name_rollback); }
 
-            const fluxoDecoded = decodeBase64(maestro.TMaestro.Fluxo);
-            if ("error" in fluxoDecoded) { return showMessage("error", fluxoDecoded.error, vscode); }
+            const flowDecoded = decodeBase64(maestro.TMaestro.Fluxo);
+            if ("error" in flowDecoded) { throw new Error(flowDecoded.error); }
 
-            const fluxoJSON: IMaestroFile = JSON.parse(fluxoDecoded.data);
-            const maestroConfig = fluxoJSON.config;
+            flowDecoded.data = flowDecoded.data.replace(regex, `${newName.trim()}`);
+            const validatorToUpdate = await validator.valid("to_update", flowDecoded.data, newName);
+            if (!validatorToUpdate.success) { throw new Error(validatorToUpdate.message); }
 
-            //Altera toda a estrutura da arvore original
-            maestroConfig.forEach((conf) => {
-                console.log(conf);
-                if (normalizeToUnderscore(conf.name) === normalizeToUnderscore(conf.name)) {
-                    const originalTree = fluxoJSON.tree.split(";").map((n) => n.split("."));
-                    originalTree.forEach((nodes) => {
-                        nodes.forEach((node) => {
-                            if (normalizeToUnderscore(node) === newName) { node = newName; }
-                        });
-                    });
-                    conf.name = newName;
-
-                }
-            });
-
-            const fluxoEnconded = encodeBase64(JSON.stringify(fluxoJSON));
-            if ("error" in fluxoEnconded) { return showMessage("error", fluxoEnconded.error, vscode); }
-
+            const fluxoEnconded = encodeBase64(flowDecoded.data);
+            if (fluxoEnconded.error) { throw Error(fluxoEnconded.error); }
             maestro.TMaestro.Fluxo = fluxoEnconded.data;
-            console.log(maestro);
 
             const maestroUpdated = await apiDeskManager("Maestro", maestro, token, "application/json", "PUT");
+            if ("erro" in maestroUpdated) { throw new Error(messages.errors.http_maestro_response_error.concat("Falha na requisição")); }
 
-            fs.writeFileSync(configPath, JSON.stringify(config, null, 2)); // Com identação
+            return showMessage("information", messages.success.file_name_update, vscode);
         } catch (error) {
-            return showMessage('error', messages.errors.maestro_config_not_loaded + error, vscode);
+            fs.renameSync(newPath, oldPath);
+            return showMessage('error', messages.errors.exception + error, vscode);
         }
     }
 };

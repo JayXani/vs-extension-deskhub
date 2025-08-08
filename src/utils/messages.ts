@@ -2,6 +2,7 @@
 //Mensagens gerais do sistema
 export const messages = {
     errors: {
+        exception: "FAIL: ",
         http_list_maestro_fail: "ATENÇÃO !Ocorreu um erro durante a busca pela listagem de maestros.",
         http_list_maestro_exception: "ATENÇÃO !\n\nUma excessão ocorreu durante o processo: ",
         http_url_cannot_be_empty: "ATENÇÃO !\n\nA URL informada não pode ser uma string vazia.",
@@ -16,11 +17,13 @@ export const messages = {
         maestro_config_not_found: "ATENÇÃO !\n\nNão encontramos nenhum arquivo .json em:",
         maestro_config_not_loaded: "ERRO ! Não conseguimos realizar a leitura do arquivo JSON",
         maestro_config_array_invalid: "ATENÇÃO ! Não foi possível carregar o array da árvore do maestro",
-        maestro_length_not_equal: "ATENÇÃO ! Não é possível realizar o upload pois o tamanho da arvore original é diferente do tamanho da arvore no maestro.config.",
-        maestro_name_rollback: "ATENÇÃO ! Não foi possível realizar a atualização do nome no maestro, portanto, alteramos o nome original do arquivo. Valide suas credenciais do ambiente."
+        maestro_config_type: "ATENÇÃO ! O tipo do config do maestro não pode ser uma string.",
+        maestro_name_rollback: "ATENÇÃO ! Não foi possível realizar a atualização do nome no maestro, portanto, alteramos o nome original do arquivo. Valide suas credenciais do ambiente.",
+        name_not_is_valid: "ATENÇAO ! O nome do parse deve conter somente letras, números e underlines (_)."
     },
     success: {
         validation_request: "Sucesso !\n\nDados para requisição validados.",
         maestros_found: "Sucesso !\n\nMaestros encontrados.",
+        file_name_update: "Sucesso ! O nome do parse foi alterado."
     }
 };

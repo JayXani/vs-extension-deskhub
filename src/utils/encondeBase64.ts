@@ -1,8 +1,8 @@
-export const encodeBase64 = (fileString: any) => {
+export const encodeBase64 = (file: any) => {
     try {
-        const jsonEncoded = JSON.stringify(fileString);
+        const bufferFile = Buffer.from(file).toString("base64");
         return {
-            data: btoa(jsonEncoded) // Converte o objeto novamente para base64
+            data: bufferFile
         };
     } catch (e) {
         return {

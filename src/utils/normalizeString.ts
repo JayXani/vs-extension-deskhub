@@ -6,5 +6,9 @@ export function normalizeToUnderscore(text: string): string {
         .replace(/[^\w]/g, "_")               // troca qualquer caractere não alfanumérico por _
         .replace(/_+/g, "_")                  // substitui múltiplos _ por um só
         .replace(/^_+|_+$/g, "")              // remove _ do início/fim
-        .toUpperCase();                       // opcional: tudo maiúsculo
+        .toUpperCase().trim();                       // opcional: tudo maiúsculo
+}
+
+export function escapeRegex(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

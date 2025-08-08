@@ -1,3 +1,3 @@
 export interface IValidatorProcess {
-    process(obj: any): { success: boolean, message: string };
+    process(...args: any): { success: boolean, message: string };
 }

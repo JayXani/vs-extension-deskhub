@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { RequestsValidatorsController } from "../Controller/RequestsValidatorsController";
 import { IPathValidation } from "../interfaces/IPathValidation";
+import { messages } from "./messages";
 
 export const createMaestroFilesPy = async (basePath: string, maestroResponse: IMaestroResponse) => {
     const validator = new RequestsValidatorsController();
@@ -38,7 +39,15 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
             ...foldersIsValid
         };
     }
-
+    if (typeof maestroConfig === "string") {
+        return {
+            success: false,
+            message: messages.errors.maestro_config_type,
+            constants: [],
+            cron: [],
+            path: "",
+        };
+    }
     maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", "").trim(), cfg));
 
     fs.mkdirSync(fullPathMain, { recursive: true });

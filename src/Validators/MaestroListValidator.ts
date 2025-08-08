@@ -19,6 +19,6 @@ export class MaestroListValidator implements IValidatorProcess {
         return {
             success: true,
             message: messages.success.maestros_found
-        }
+        };
     }
 }

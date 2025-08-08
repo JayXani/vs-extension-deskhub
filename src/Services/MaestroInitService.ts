@@ -70,7 +70,6 @@ export class MaestroInitService {
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
-
             const filesCreated = await createMaestroFilesPy(workspacePath, maestroChoice);
             if (!filesCreated.success) { return showMessage("warning", filesCreated.message, vscode); }
 

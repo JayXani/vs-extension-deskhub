@@ -14,9 +14,8 @@ export const apiDeskManager = async (
         endpoint = endpoint.replace(/^\//, '');
 
         const fullUrl = `${url}/${endpoint}`;
-
         const response = await fetch(fullUrl, {
-            body: JSON.stringify(body),
+            body: typeof body === "string" ? body : JSON.stringify(body),
             headers: {
                 "Content-type": contentType,
                 "Authorization": authorization
@@ -27,9 +26,12 @@ export const apiDeskManager = async (
         if (!response.ok) {
             return messages.errors.http_list_maestro_fail;
         }
-        const dataResponse = await response.json();
+        let dataResponse = await response.text();
+        try {
+            const jsonMatch = dataResponse.match(/^\{.*\}/g);
+            if (jsonMatch) { return JSON.parse(jsonMatch[0]); }
+        } catch (e) { }
         return dataResponse;
-
     } catch (e) {
         return {
             erro: messages.errors.http_list_maestro_exception.concat(`${e}`)
