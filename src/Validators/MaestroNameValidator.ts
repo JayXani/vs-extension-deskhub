@@ -12,13 +12,15 @@ export class MaestroNameValidator implements IValidatorProcess {
             if (typeof maestroFile.config === "string") { config = JSON.parse(maestroFile.config); }
 
             for (const cfg of config) {
-                if (!(/[a-zA-Z_]/.test(cfg.name))) {
+                // Valida se o nome do parse está na formatação incorreta, caso sim, retorne o erro.
+                if ((/[^a-zA-Z0-9\s?_?]/g.test(cfg.name))) {
                     return {
                         success: false,
                         message: messages.errors.name_not_is_valid
                     };
                 }
-                if (normalizeToUnderscore(cfg.name) === normalizeToUnderscore(newName)) { occurrencesNames += 1; }
+                const confNameReplaced = cfg.name.replace("PARSE_", "").trim();
+                if (normalizeToUnderscore(confNameReplaced) === normalizeToUnderscore(newName)) { occurrencesNames += 1; }
             }
             if (occurrencesNames > 1) {
                 return {

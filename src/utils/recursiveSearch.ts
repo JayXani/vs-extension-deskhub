@@ -6,7 +6,7 @@ export const recursiveSearch = (dir: string, key: string) => {
     for (const entry of entries) {
         if (entry.isDirectory()) {
             const currentPath = path.join(dir, entry.name);
-            if (entry.name.includes(key)) { return currentPath; }
+            if (entry.name.toLowerCase().includes(key.toLowerCase())) { return currentPath; }
             const result = recursiveSearch(currentPath, key);
             if (result) { return result; }
         }
