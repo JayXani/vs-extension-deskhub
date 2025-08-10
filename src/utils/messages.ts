@@ -8,7 +8,7 @@ export const messages = {
         http_url_cannot_be_empty: "ATENÇÃO !\n\nA URL informada não pode ser uma string vazia.",
         http_format_url_invalid: "ATENÇÃO !\n\nA URL informada não possui a formatação correta.",
         http_token_cannot_be_empty: "ATENÇÃO !\n\nCredencial não pode ser vazio.",
-        http_maestro_not_found: "ATENÇÃO !\n\nNão encontramos nenhum maestro com as informações passadas.",
+        http_maestro_not_found: "ATENÇÃO !\n\nNão encontramos nenhum maestro com as informações passadas, valide as credenciais.",
         http_maestro_response_error: "ERRO: ",
         string_is_not_base64: "ATENÇÃO! A String informada não é um base64.",
         folder_exists: "ATENÇÃO! Use a flag --merge ou a opção Maestro: Merge, pois já existe uma pasta com o nome: ",

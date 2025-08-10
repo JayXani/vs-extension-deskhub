@@ -29,6 +29,10 @@
       {
         "command": "maestro.tree",
         "title": "Maestro: Visualizar fluxo do maestro"
+      },
+      {
+        "command": "maestro.merge",
+        "title": "Maestro: Combinar alterações"
       }
     ]
   },

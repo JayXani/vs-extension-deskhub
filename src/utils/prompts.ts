@@ -102,3 +102,33 @@ export async function promptApiKey(vscode: any) {
     ]);
     return apiKey;
 }
+
+export async function promptConfirmMerge(vscode: any) {
+    if (vscode) {
+        return vscode.window.showWarningMessage(
+            "ATENÇÃO !\n\nInformamos que o merge prioriza os dados do maestro, portanto, se o código atual no maestro estiver desatualizado, os parses no vscode também estarão desatualizados.\nÉ importante que realize o upload antes de realizar o merge, ou marque a opção autoBuilded como true dentro do maestro.config, para realizar o upload automático.\n\nVocê confirma o merge ?",
+            { modal: true },
+            "Sim",
+            "Não"
+        );
+    }
+    const prompt = inquirer.createPromptModule();
+    const { confirmed } = await prompt([
+        {
+            type: "rawlist",
+            name: "confirmed",
+            message: "ATENÇÃO !\n\nInformamos que o merge prioriza os dados do maestro, portanto, se o código atual no maestro estiver desatualizado, os parses no vscode também estarão desatualizados.\nÉ importante que realize o upload antes de realizar o merge, ou marque a opção autoBuilded como true dentro do maestro.config, para realizar o upload automático.\n\nVocê confirma o merge ?",
+            choices: [
+                {
+                name: "Sim",
+                value: "S"
+            },
+            {
+                name: "Não",
+                value: "N"
+            }
+            ]
+        }
+    ]);
+    return confirmed;
+}

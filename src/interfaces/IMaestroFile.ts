@@ -1,5 +1,5 @@
 export interface IMaestroFile {
-    config: any[] | string
+    config: any[] | string,
     tree: string,
     constants: [],
     cron: [] 

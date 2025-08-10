@@ -13,8 +13,8 @@ if (args.includes('--init')) {
 }
 
 if(args.includes("--upload")){
-  const maestroService = new MaestroUploadService();
-  maestroService.run(currentDirectory, false);
+  const maestroService = new MaestroUploadService(false);
+  maestroService.run(currentDirectory);
 }
 
 if(args.includes("--merge")){

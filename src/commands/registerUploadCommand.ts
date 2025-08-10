@@ -8,8 +8,8 @@ const registerUploadCommand = async (context: vscode.ExtensionContext) => {
             vscode.window.showInformationMessage('Nenhuma pasta foi aberta no VS Code.');
             return;
         }
-        const maestroUpload = new MaestroUploadService();
-        await maestroUpload.run(workspace.uri.fsPath, vscode);
+        const maestroUpload = new MaestroUploadService(vscode);
+        await maestroUpload.run(workspace.uri.fsPath);
     });
 
     context.subscriptions.push(command);
