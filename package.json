@@ -14,7 +14,7 @@
   ],
   "main": "./out/src/extension.js",
   "bin": {
-    "maestro": "./out/bin/deskhub-maestro.js"
+    "maestro": "./out/bin/commands/maestro-commands.js"
   },
   "contributes": {
     "commands": [

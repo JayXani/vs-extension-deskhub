@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import { registerInitCommand } from './commands/registerInitCommand';
-import registerUploadCommand from './commands/registerUploadCommand';
-import { registerTreeCommand } from './commands/registerTreeCommand';
-import { registerListenerFolder } from './commands/registerListenerFolders';
-import { registerMergeMaestro } from './commands/registerMergeMaestro';
-
+import { registerMergeMaestro } from './Infra/Commands/registerMergeMaestro';
+import registerUploadCommand from './Infra/Commands/registerUploadCommand';
+import { registerTreeCommand } from './Infra/Commands/registerTreeCommand';
+import { registerInitCommand } from './Infra/Commands/registerInitCommand';
+import { registerListenerFolder } from './Infra/Commands/registerListenerFolders';
 
 export function activate(context: vscode.ExtensionContext) {
   registerMergeMaestro(context);
