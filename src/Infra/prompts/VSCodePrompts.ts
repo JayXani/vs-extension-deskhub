@@ -1,6 +1,7 @@
 import * as inquirer from 'inquirer';
+import { IPrompts } from '../../Domain/types/IPrompts';
 
-export class VSCodePrompts {
+export class VSCodePrompts implements IPrompts {
     constructor(private vscode: any){}
     async promptGetToken(): Promise<string | undefined> {
         if (!this.vscode) {

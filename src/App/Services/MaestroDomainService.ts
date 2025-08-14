@@ -3,8 +3,8 @@ import fs from 'fs';
 import { messagesV2 } from "../../Shared/constants/messages-v2";
 import { searchMaestroInFolder } from "../../Infra/maestro/searchMaestroInFolder";
 import { IMaestroConfig } from "../../Domain/types/IMaestroConfig";
-import { IMaestroResponse } from "../../Domain/types/IMaestroRequests";
-import { IDataRequest } from "../../Domain/types/IDataRequest";
+import { IMaestroList, IMaestroResponse } from "../../Domain/types/IMaestroRequests";
+import { IDataList, IDataRequestKey } from "../../Domain/types/IDataRequest";
 import { decodeBase64 } from "../../Shared/helpers/decodeBase64";
 import { IMaestroFile } from "../../Domain/types/IMaestroFile";
 import { encodeBase64 } from "../../Shared/helpers/encondeBase64";
@@ -16,20 +16,24 @@ import { MaestroRootEmptyError } from '../../Domain/errors/MaestroRootEmptyError
 import { MaestroConfigNotFoundError } from '../../Domain/errors/MaestroConfigNotFoundError';
 import { MaestroNotChooseError } from '../../Domain/errors/MaestroNotChooseError';
 import { MaestroNotFoundError } from '../../Domain/errors/MaestroNotFoundError';
-import { ErrorCodes } from '../../Domain/errors/ErrorCodes';
+import { ErrorCodes } from '../../Shared/constants/ErrorCodes';
 import { MaestroContentConfigError } from '../../Domain/errors/MaestroContentConfigError';
 import { MaestroBase64Error } from '../../Domain/errors/MaestroBase64Error';
+import { MaestroValidatorService } from './MaestroValidatorService';
+import { IPrompts } from '../../Domain/types/IPrompts';
+import { MaestroListError } from '../../Domain/errors/MaestroListError';
 
 
-export class MaestroDomainService {
-    private vscodePrompts: VSCodePrompts;
-    private vscode: any;
+export abstract class MaestroDomainService {
+    private controllerValidation: MaestroValidatorService;
 
-    constructor(vscode: any) {
+    constructor(private vscode: any, private vscodePrompts: IPrompts) {
         this.vscode = vscode;
-        this.vscodePrompts = new VSCodePrompts(this.vscode);
+        this.controllerValidation = new MaestroValidatorService();
     }
-    public getVscode(): any { return this.vscode; }
+
+    public getPrompts() { return this.vscodePrompts; }
+    public getVscode() { return this.vscode; }
     public async getMaestroPath(basePath: string) {
         const maestrosFound = searchMaestroInFolder("MAESTRO", basePath);
         if (!maestrosFound.success) { throw new MaestroNotFoundError(messagesV2.errors[ErrorCodes.MAESTRO_NOT_FOUND_ERROR]); }
@@ -48,7 +52,7 @@ export class MaestroDomainService {
     }
 
     public loadMaestroConfig(maestro: MaestroFileChoose) {
-    
+
         const maestroConfigPath = path.join(maestro.path, "maestro.config.json");
         if (!fs.existsSync(maestroConfigPath)) {
             throw new MaestroConfigNotFoundError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_NOT_FOUND_ERROR].replace("{path}", maestroConfigPath));
@@ -61,12 +65,13 @@ export class MaestroDomainService {
     }
 
     public async downloadMaestroDM(maestroFile: MaestroFileChoose, token: string) {
-        const bodyFind: IDataRequest = {
-            url: "Maestro",
+        const bodyFind: IDataRequestKey = {
             authorizationToken: token,
-            bodyDownload: { Chave: maestroFile.key }
+            body: {
+                Chave: maestroFile.key
+            }
         };
-        const maestroResponse: IMaestroResponse = await apiDeskManager(bodyFind.url, bodyFind.bodyDownload, token);
+        const maestroResponse: IMaestroResponse = await apiDeskManager("Maestro", bodyFind.body, token);
         if (!maestroResponse.TMaestro) { throw new MaestroContentConfigError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_CONTENT_ERROR]); }
 
         const flowDecoded = decodeBase64(maestroResponse.TMaestro.Fluxo);
@@ -90,6 +95,35 @@ export class MaestroDomainService {
 
         maestroDMCopy.TMaestro.Fluxo = fileEncoded.data;
         return maestroDMCopy;
+    }
+
+    public async loadMaestroList(token: string, search?: string) {
+        const bodyList: IDataList = {
+            authorizationToken: token,
+            body: {
+                Pesquisa: search,
+                Tudo: "true",
+                Ativo: "1"
+            }
+        };
+        const maestroList: IMaestroList = await apiDeskManager("Maestro/lista", bodyList.body, bodyList.authorizationToken);
+        if ("erro" in maestroList) { throw new MaestroListError(messagesV2.errors[ErrorCodes.MAESTRO_LIST_ERROR]); }
+        await this.controllerValidation.valid('maestrolist', maestroList);
+
+        return maestroList;
+    }
+    public async loadMaestroChoose(maestroList: IMaestroList, token: string) {
+        const bodyKey: IDataRequestKey = {
+            authorizationToken: token,
+            body: {
+                Chave: ""
+            }
+        };
+        const maestroChoose = await this.getPrompts().promptMaestro(maestroList);
+        bodyKey.body.Chave = maestroChoose.key;
+        const maestroChoice: IMaestroResponse = await apiDeskManager("Maestro", bodyKey.body, bodyKey.authorizationToken);
+        await this.controllerValidation.valid("maestrotfile", maestroChoice);
+        return maestroChoice;
     }
 
 }

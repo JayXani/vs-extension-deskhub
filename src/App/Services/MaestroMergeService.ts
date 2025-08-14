@@ -4,7 +4,7 @@ import { showMessage } from "../../Shared/ui/showMessage";
 import { VSCodePrompts } from "../../Infra/prompts/VSCodePrompts";
 import { MaestroRootEmptyError } from "../../Domain/errors/MaestroRootEmptyError";
 import { messages } from "../../Shared/constants/messages";
-import { ErrorCodes } from "../../Domain/errors/ErrorCodes";
+import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
 
 export class MaestroMergeService {
     constructor(private vscode: any) { }

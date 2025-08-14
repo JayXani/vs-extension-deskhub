@@ -1,15 +1,16 @@
-export interface IDataRequest { 
-    url: string, 
+export interface IDataRequest {
     authorizationToken: string,
-    bodyDownload?: {
-        Chave: string,
-    }
-    bodyUpload?: {
-        Chave: string
-    }
-    bodyList?: {
+}
+export interface IDataList extends IDataRequest {
+    body: {
         Pesquisa: string,
         Tudo: string,
         Ativo: string
+    }
+}
+
+export interface IDataRequestKey extends IDataRequest {
+    body: {
+        Chave: string
     }
 }

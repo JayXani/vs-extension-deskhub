@@ -1,4 +1,4 @@
-import { ErrorCodes } from "./ErrorCodes";
+import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
 
 export type GeneralErrorType = {
   type: string;
@@ -20,7 +20,7 @@ export class GeneralError{
     this.name = new.target.name;
     this.type = args.type;
     this.code = args.code;
-    this.message = args.message;
+    this.message = args.message.replace("{type}", args.type).replace("{code}", args.code);
     this.stackTracerError = args.stackTracerError ?? this.stack;
 
     // Garante stack trace limpa no Node.js

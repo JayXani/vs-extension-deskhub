@@ -1,12 +1,12 @@
 import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
 import { GeneralError } from "./GeneralError";
 
-export class MaestroBase64Error extends GeneralError {
+export class MaestroTokenNotFoundError extends GeneralError {
     constructor(message: string) {
         super({
-            type: "MaestroBase64Error",
+            type: "MaestroTokenNotFoundError",
             message: message,
-            code: ErrorCodes.MAESTRO_BASE64_ERROR,
+            code: ErrorCodes.MAESTRO_TOKEN_EMPTY_ERROR,
         });
     }
 }

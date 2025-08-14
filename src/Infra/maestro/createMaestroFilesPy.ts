@@ -6,19 +6,17 @@ import * as fs from 'fs';
 import { MaestroValidatorService } from "../../App/Services/MaestroValidatorService";
 import { IPathValidation } from "../../Domain/types/IPathValidation";
 import { messages } from "../../Shared/constants/messages";
+import { MaestroConfigNotIsJSONError } from "../../Domain/errors/MaestroConfigNotIsJSONError";
+import { MaestroBase64Error } from "../../Domain/errors/MaestroBase64Error";
+import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
+import { messagesV2 } from "../../Shared/constants/messages-v2";
 
 export const createMaestroFilesPy = async (basePath: string, maestroResponse: IMaestroResponse) => {
     const validator = new MaestroValidatorService();
 
     const stringConverted = decodeBase64(maestroResponse.TMaestro.Fluxo);
     if (stringConverted.error) {
-        return {
-            success: false,
-            message: stringConverted.error,
-            constants: [],
-            cron: [],
-            path: "",
-        };
+        throw new MaestroBase64Error(messagesV2.errors[ErrorCodes.MAESTRO_BASE64_ERROR].concat(`- ${stringConverted.error}`));
     }
     const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
     const maestroConfig = maestroJSON.config;
@@ -32,21 +30,9 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
         fullPathMaestro: fullPathMain,
         keyMaestro: maestroKey
     };
-    const foldersIsValid = await validator.valid("folder_to_save", pathValidation); //Realiza toda a validação das pastas antes de realizar a criação do maestro
-    if (!foldersIsValid.success) {
-        return {
-            path: "",
-            ...foldersIsValid
-        };
-    }
+    await validator.valid("folder_to_save", pathValidation); //Realiza toda a validação das pastas antes de realizar a criação do maestro
     if (typeof maestroConfig === "string") {
-        return {
-            success: false,
-            message: messages.errors.maestro_config_type,
-            constants: [],
-            cron: [],
-            path: "",
-        };
+        throw new MaestroConfigNotIsJSONError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_CONTENT_ERROR]);
     }
     maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", "").trim(), cfg));
 

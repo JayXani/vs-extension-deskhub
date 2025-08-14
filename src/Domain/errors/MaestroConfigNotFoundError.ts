@@ -1,8 +1,8 @@
-import { ErrorCodes } from "./ErrorCodes";
+import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
 import { GeneralError } from "./GeneralError";
 
 export class MaestroConfigNotFoundError extends GeneralError {
-    constructor(message: string){ 
+    constructor(message: string) {
         super({
             type: "MaestroConfigNotFoundError",
             message: message,
