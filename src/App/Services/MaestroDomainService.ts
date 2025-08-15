@@ -11,7 +11,6 @@ import { encodeBase64 } from "../../Shared/helpers/encondeBase64";
 import { flowBuilder } from "../../Infra/maestro/flowBuilder";
 import { MaestroFileChoose } from '../../Domain/types/MaestroFileChoose';
 import { apiDeskManager } from '../../Infra/api/http-request';
-import { VSCodePrompts } from '../../Infra/prompts/VSCodePrompts';
 import { MaestroRootEmptyError } from '../../Domain/errors/MaestroRootEmptyError';
 import { MaestroConfigNotFoundError } from '../../Domain/errors/MaestroConfigNotFoundError';
 import { MaestroNotChooseError } from '../../Domain/errors/MaestroNotChooseError';

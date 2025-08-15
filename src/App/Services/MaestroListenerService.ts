@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { showMessage } from '../../Shared/ui/showMessage';
-import { messages } from '../../Shared/constants/messages';
+import { messagesV2 } from '../../Shared/constants/messages-v2';
 import { IMaestroConfig } from '../../Domain/types/IMaestroConfig';
 import { escapeRegex } from '../../Shared/helpers/normalizeString';
 import { IMaestroResponse } from '../../Domain/types/IMaestroRequests';
@@ -10,8 +9,20 @@ import { decodeBase64 } from '../../Shared/helpers/decodeBase64';
 import { encodeBase64 } from '../../Shared/helpers/encondeBase64';
 import { MaestroValidatorService } from './MaestroValidatorService';
 import { apiDeskManager } from '../../Infra/api/http-request';
+import { formatErrorResponse } from '../../Domain/errors/formatErrorResponse';
+import { MaestroUpdateNameError } from '../../Domain/errors/MaestroUpdateNameError';
+import { ErrorCodes } from '../../Shared/constants/ErrorCodes';
+import { MaestroConfigNotFoundError } from '../../Domain/errors/MaestroConfigNotFoundError';
+import { MaestroNotFoundError } from '../../Domain/errors/MaestroNotFoundError';
+import { SuccessCodes } from '../../Shared/constants/SuccessCodes';
+import { MaestroBase64Error } from '../../Domain/errors/MaestroBase64Error';
+import { MaestroDomainService } from './MaestroDomainService';
+import { VSCodePrompts } from '../../Infra/prompts/VSCodePrompts';
 
-export class MaestroListenerService {
+export class MaestroListenerService extends MaestroDomainService{
+    constructor(vscode: any, prompt: VSCodePrompts){
+        super(vscode, prompt);
+    }
     async run(event: vscode.FileRenameEvent) {
         const validator = new MaestroValidatorService();
         for (const file of event.files) {
@@ -25,7 +36,7 @@ export class MaestroListenerService {
             if (!maestroDir) { continue; }
 
             const configPath = path.join(maestroDir, 'maestro.config.json');
-            if (!fs.existsSync(configPath)) { throw new Error(messages.errors.maestro_config_not_found + maestroDir); }
+            if (!fs.existsSync(configPath)) { throw new MaestroConfigNotFoundError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_NOT_FOUND_ERROR] + maestroDir); }
             try {
                 const configContent = fs.readFileSync(configPath, 'utf-8');
                 const config: IMaestroConfig = JSON.parse(configContent) as IMaestroConfig;
@@ -37,26 +48,30 @@ export class MaestroListenerService {
                 const regex = new RegExp(escapeRegex(`${oldName}`), 'g');
 
                 const maestro: IMaestroResponse = await apiDeskManager("Maestro", { Chave: config.key }, token);
-                if (!maestro || "erro" in maestro) { throw new Error(messages.errors.maestro_name_rollback); }
+                if (!maestro || "erro" in maestro) { throw new MaestroUpdateNameError(messagesV2.errors[ErrorCodes.MAESTRO_NAME_ERROR]); }
 
                 const flowDecoded = decodeBase64(maestro.TMaestro.Fluxo);
-                if ("error" in flowDecoded) { throw new Error(flowDecoded.error); }
+                if ("error" in flowDecoded) { throw new MaestroBase64Error(flowDecoded.error); }
 
                 flowDecoded.data = flowDecoded.data.replace(regex, `${newName.trim()}`);
-                const validatorToUpdate = await validator.valid("to_update", flowDecoded.data, newName);
-                if (!validatorToUpdate.success) { throw new Error(validatorToUpdate.message); }
-
-                const fluxoEnconded = encodeBase64(flowDecoded.data);
-                if (fluxoEnconded.error) { throw Error(fluxoEnconded.error); }
-                maestro.TMaestro.Fluxo = fluxoEnconded.data;
+                await validator.valid("to_update", flowDecoded.data, newName);
+                
+                const flowEncoded = encodeBase64(flowDecoded.data);
+                if (flowEncoded.error) { throw new MaestroBase64Error(flowEncoded.error); }
+                maestro.TMaestro.Fluxo = flowEncoded.data;
 
                 const maestroUpdated = await apiDeskManager("Maestro", maestro, token, "application/json", "PUT");
-                if ("erro" in maestroUpdated) { throw new Error(messages.errors.http_maestro_response_error.concat("Falha na requisição")); }
+                if ("erro" in maestroUpdated) { 
+                    throw new MaestroNotFoundError(messagesV2.errors[ErrorCodes.MAESTRO_NOT_UPDATE].concat("Falha na tentativa de atualizar.")); 
+                }
 
-                return showMessage("information", messages.success.file_name_update, vscode);
+                return {
+                    success: true,
+                    message: messagesV2.success[SuccessCodes.SUCCESS_RENAME_FOLDER]
+                };
             } catch (error) {
                 fs.renameSync(newPath, oldPath);
-                return showMessage('error', messages.errors.exception + error, vscode);
+                return formatErrorResponse(error);
             }
         }
     }
