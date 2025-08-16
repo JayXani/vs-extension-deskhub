@@ -1,4 +1,6 @@
-export interface IMaestroList { 
+import { IMaestroFile } from "./IMaestroFile";
+
+export interface IMaestroList {
     root: [
         {
             Chave: number,
@@ -16,7 +18,7 @@ export interface IMaestroResponse {
     TMaestro: {
         Chave: number,
         Nome: string,
-        Descricao:string,
+        Descricao: string,
         Fluxo: Base64URLString,
         Token: string, //URL POST
         Publicado: string,

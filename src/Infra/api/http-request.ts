@@ -1,4 +1,6 @@
-import { messages } from "../../Shared/constants/messages";
+import { MaestroHTTPError } from "../../Domain/errors/MaestroHTTPError";
+import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
+import { messagesV2 } from "../../Shared/constants/messages-v2";
 
 export const apiDeskManager = async (
     endpoint: string,
@@ -8,33 +10,26 @@ export const apiDeskManager = async (
     method: string = "POST",
     url: string = "https://api.desk.ms"
 ) => {
+
+    // Corrige possíveis barras duplicadas
+    url = url.replace(/\/$/, '');
+    endpoint = endpoint.replace(/^\//, '');
+
+    const fullUrl = `${url}/${endpoint}`;
+    const response = await fetch(fullUrl, {
+        body: typeof body === "string" ? body : JSON.stringify(body),
+        headers: {
+            "Content-type": contentType,
+            "Authorization": authorization
+        },
+        method: method
+    });
+
+    if (!response.ok) { throw new MaestroHTTPError(messagesV2.errors[ErrorCodes.MAESTRO_HTTP_ERROR]); }
+    let dataResponse = await response.text();
     try {
-        // Corrige possíveis barras duplicadas
-        url = url.replace(/\/$/, '');
-        endpoint = endpoint.replace(/^\//, '');
-
-        const fullUrl = `${url}/${endpoint}`;
-        const response = await fetch(fullUrl, {
-            body: typeof body === "string" ? body : JSON.stringify(body),
-            headers: {
-                "Content-type": contentType,
-                "Authorization": authorization
-            },
-            method: method
-        });
-
-        if (!response.ok) {
-            return messages.errors.http_list_maestro_fail;
-        }
-        let dataResponse = await response.text();
-        try {
-            const jsonMatch = dataResponse.match(/^\{.*\}/g);
-            if (jsonMatch) { return JSON.parse(jsonMatch[0]); }
-        } catch (e) { }
-        return dataResponse;
-    } catch (e) {
-        return {
-            erro: messages.errors.http_list_maestro_exception.concat(`${e}`)
-        };
-    }
+        const jsonMatch = dataResponse.match(/^\{.*\}/g);
+        if (jsonMatch) { return JSON.parse(jsonMatch[0]); }
+    } catch (e) { }
+    return dataResponse;
 };

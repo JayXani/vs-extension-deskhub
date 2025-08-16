@@ -12,7 +12,7 @@ export interface IMaestroConfig {
     files: Array<Object>,
     constants: any[],
     cron: any[],
-    autoBuilded: boolean,
+    warningMessageView: boolean,
     pathMaestro: string,
     created_at: string,
     updated_at: string

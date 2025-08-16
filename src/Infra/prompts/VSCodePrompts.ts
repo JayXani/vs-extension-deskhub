@@ -104,6 +104,7 @@ export class VSCodePrompts implements IPrompts {
         return apiKey;
     }
 
+    //NÃO UTILIZADO, MANTER COMO TEMPLATE POR ENQUANTO
     async promptConfirmMerge() {
         if (this.vscode) {
             return this.vscode.window.showWarningMessage(

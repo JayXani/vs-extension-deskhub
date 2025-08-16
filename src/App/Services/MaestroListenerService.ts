@@ -50,7 +50,7 @@ export class MaestroListenerService extends MaestroDomainService{
                 const maestro: IMaestroResponse = await apiDeskManager("Maestro", { Chave: config.key }, token);
                 if (!maestro || "erro" in maestro) { throw new MaestroUpdateNameError(messagesV2.errors[ErrorCodes.MAESTRO_NAME_ERROR]); }
 
-                const flowDecoded = decodeBase64(maestro.TMaestro.Fluxo);
+                const flowDecoded = decodeBase64(maestro.TMaestro.Fluxo as string);
                 if ("error" in flowDecoded) { throw new MaestroBase64Error(flowDecoded.error); }
 
                 flowDecoded.data = flowDecoded.data.replace(regex, `${newName.trim()}`);

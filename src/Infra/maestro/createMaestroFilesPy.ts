@@ -5,7 +5,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { MaestroValidatorService } from "../../App/Services/MaestroValidatorService";
 import { IPathValidation } from "../../Domain/types/IPathValidation";
-import { messages } from "../../Shared/constants/messages";
 import { MaestroConfigNotIsJSONError } from "../../Domain/errors/MaestroConfigNotIsJSONError";
 import { MaestroBase64Error } from "../../Domain/errors/MaestroBase64Error";
 import { ErrorCodes } from "../../Shared/constants/ErrorCodes";
@@ -14,11 +13,17 @@ import { messagesV2 } from "../../Shared/constants/messages-v2";
 export const createMaestroFilesPy = async (basePath: string, maestroResponse: IMaestroResponse) => {
     const validator = new MaestroValidatorService();
 
-    const stringConverted = decodeBase64(maestroResponse.TMaestro.Fluxo);
+    const stringConverted = decodeBase64(maestroResponse.TMaestro.Fluxo as string);
     if (stringConverted.error) {
         throw new MaestroBase64Error(messagesV2.errors[ErrorCodes.MAESTRO_BASE64_ERROR].concat(`- ${stringConverted.error}`));
     }
-    const maestroJSON: IMaestroFile = JSON.parse(stringConverted.data);
+    let maestroJSON: IMaestroFile = null;
+    try {
+        maestroJSON = JSON.parse(stringConverted.data);
+    } catch (e) {
+        throw new MaestroConfigNotIsJSONError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_CONTENT_ERROR]);
+    }
+
     const maestroConfig = maestroJSON.config;
     const configMap = new Map<string, IMaestroTree>();
     const tree = maestroJSON.tree.split(";").map((t) => t.split("."));
@@ -35,10 +40,20 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
         throw new MaestroConfigNotIsJSONError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_CONTENT_ERROR]);
     }
     maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", "").trim(), cfg));
+    
+    createFiles(basePath, tree, configMap);
+    return {
+        success: true,
+        message: "Pastas criadas com sucesso",
+        constants: maestroJSON.constants,
+        cron: maestroJSON.cron,
+        path: fullPathMain
+    };
+};
 
-    fs.mkdirSync(fullPathMain, { recursive: true });
+export const createFiles = (basePath: string, tree: Array<string[]>, configMap: Map<string, IMaestroTree>) => {
     for (const pathTree of tree) {
-        let currentPath = fullPathMain;
+        let currentPath = basePath;
         for (const part of pathTree) {
             const partReplaced = part.replace("PARSE_", "").trim();
             const config = configMap.get(partReplaced);
@@ -50,18 +65,12 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
                     config._written = true; //Garante que as pastas não sejam criadas duplicadas, garantindo unicidade
                     if (config.jsonata) {
                         const content = config.jsonata;
-                        const filePath = path.join(currentPath, `${part.replace("PARSE_", "")}.py`);
+                        const filePath = path.join(currentPath, `${part.replace("PARSE_", "").trim()}.py`);
+                        if(fs.existsSync(filePath)){ continue; }
                         fs.writeFileSync(filePath, content, { encoding: "utf-8" });
                     }
                 }
             }
         }
     }
-    return {
-        success: true,
-        message: "Pastas criadas com sucesso",
-        constants: maestroJSON.constants,
-        cron: maestroJSON.cron,
-        path: fullPathMain
-    };
 };

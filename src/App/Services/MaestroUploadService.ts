@@ -26,7 +26,7 @@ export class MaestroUploadService extends MaestroDomainService {
             const tokenMaestro = await apiDeskManager("Login/autenticar", { PublicKey: maestroFileConfig.publicKey }, maestroFileConfig.apiKey);
             const maestroDownloaded = await this.downloadMaestroDM(maestroFileChoose, tokenMaestro);
 
-            const maestroConfigJson: IMaestroFile = JSON.parse(maestroDownloaded.TMaestro.Fluxo);
+            const maestroConfigJson: IMaestroFile = JSON.parse(maestroDownloaded.TMaestro.Fluxo as string);
             if (typeof maestroConfigJson.config === "string") { maestroConfigJson.config = JSON.parse(maestroConfigJson.config); }
 
             const maestroBuilded = this.builderMaestro(maestroConfigJson, maestroFileChoose, maestroDownloaded);

@@ -22,7 +22,6 @@ export const recursiveSearch = (
 
         // Se for arquivo e onlyFolders = false
         if (!onlyFolders && entry.isFile()) {
-            console.log(entry.name);
             if (entry.name.toLowerCase().includes(key.toLowerCase())) { return currentPath; }
         }
     }

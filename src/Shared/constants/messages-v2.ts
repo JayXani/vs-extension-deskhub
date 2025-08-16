@@ -19,21 +19,17 @@ export const messagesV2 = {
         E00014: "\n{type} (código: {code}):\nNão foi possível realizar a atulização do maestro devido ao erro:",
         E00015: "\n{type} (código: {code}):\nO nome do parse deve conter somente letras, números e underlines (_).",
         E00016: "\n{type} (código: {code}):\nNão é possível realizar a alteração do nome, pois já existe um parse com o nome informado.",
-        E00017: "\n{type} (código: {code}):\nA String informada não é um base64 válido."
+        E00017: "\n{type} (código: {code}):\nA String informada não é um base64 válido.",
+        E00018: "\n{type} (código: {code}):\nIdentificador python(#python), não encontrado no arquivo, adicione o identificador antes de realizar o upload !",
+        E00019: "\n{type} (código: {code}):\nFalha durante a requisição para a API informada.",
     },
-
-        http_url_cannot_be_empty: "ATENÇÃO !\n\nA URL informada não pode ser uma string vazia.",
-        http_format_url_invalid: "ATENÇÃO !\n\nA URL informada não possui a formatação correta.",
-        folder_not_found: "ATENÇÃO !\n\nNão encontramos nenhuma pasta com a chave correspondente",
-        maestro_config_not_loaded: "ERRO ! Não conseguimos realizar a leitura do arquivo JSON",
-        maestro_config_array_invalid: "ATENÇÃO ! Não foi possível carregar o array da árvore do maestro",
-        maestro_config_type: "ATENÇÃO ! O tipo do config do maestro não pode ser uma string.",
-    
     success: {
         SUC001: "✅ Sucesso !\n\nMaestros encontrados.",
         SUC002: "✅ Sucesso !\n\nMaestro atualizado.",
         SUC003: "✅ Sucesso !\n\nDados para requisição validados.",
         SUC004: "✅ Sucesso !\n\nConfigurações realizadas.",
-        SUC005: "✅ Sucesso !\n\nO nome do parse foi alterado."
+        SUC005: "✅ Sucesso !\n\nO nome do parse foi alterado.",
+        SUC006: "✅ Sucesso !\n\nMerge cancelado.",
+        SUC007: "✅ Sucesso !\n\nMerge realizado com sucesso."
     }
 };

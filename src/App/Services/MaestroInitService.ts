@@ -52,7 +52,7 @@ export class MaestroInitService extends MaestroDomainService {
             description: maestroChoice.TMaestro.Descricao,
             constants: [],
             cron: [],
-            autoBuilded: false,
+            warningMessageView: false,
             files: maestroChoice.TFiles.map((f) => f),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()

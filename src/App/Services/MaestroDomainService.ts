@@ -73,7 +73,7 @@ export abstract class MaestroDomainService {
         const maestroResponse: IMaestroResponse = await apiDeskManager("Maestro", bodyFind.body, token);
         if (!maestroResponse.TMaestro) { throw new MaestroContentConfigError(messagesV2.errors[ErrorCodes.MAESTRO_CONFIG_CONTENT_ERROR]); }
 
-        const flowDecoded = decodeBase64(maestroResponse.TMaestro.Fluxo);
+        const flowDecoded = decodeBase64(maestroResponse.TMaestro.Fluxo as string);
         if (flowDecoded.error) { throw new MaestroBase64Error(messagesV2.errors[ErrorCodes.MAESTRO_BASE64_ERROR]); }
         maestroResponse.TMaestro.Fluxo = flowDecoded.data;
 

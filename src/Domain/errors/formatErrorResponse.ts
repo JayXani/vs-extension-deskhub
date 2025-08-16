@@ -9,7 +9,8 @@ export function formatErrorResponse(error: any) {
         error: {
             type: "ErrorNotMapped",
             code: ErrorCodes.NOT_ASSOCIATED,
-            message: messagesV2.errors[ErrorCodes.NOT_ASSOCIATED]
+            stackTrace: error?.stack || "", // pega a linha e arquivo do erro
+            message: messagesV2.errors[ErrorCodes.NOT_ASSOCIATED].replace("{code}", ErrorCodes.NOT_ASSOCIATED).replace("{type}", "ErrorNotMapped")
         }
     };
 }
