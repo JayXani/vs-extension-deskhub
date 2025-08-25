@@ -16,7 +16,6 @@ export class MaestroMergeController {
             return showMessage("information", result.message, this.vscode);
         } catch (e) {  
             const errorFormatted = formatErrorResponse(e);
-            console.log(errorFormatted);
             return showMessage("error", errorFormatted.error.message, this.vscode);
         }
     }

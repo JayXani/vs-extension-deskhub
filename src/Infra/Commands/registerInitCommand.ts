@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { MaestroInitService } from '../../App/Services/MaestroInitService';
 import { MaestroInitController } from '../../App/Controllers/MaestroInitController';
 
 export function registerInitCommand(context: vscode.ExtensionContext) {
