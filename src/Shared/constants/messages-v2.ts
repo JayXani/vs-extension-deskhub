@@ -30,6 +30,7 @@ export const messagesV2 = {
         SUC004: "✅ Sucesso !\n\nConfigurações realizadas.",
         SUC005: "✅ Sucesso !\n\nO nome do parse foi alterado.",
         SUC006: "✅ Sucesso !\n\nMerge cancelado.",
-        SUC007: "✅ Sucesso !\n\nMerge realizado com sucesso."
+        SUC007: "✅ Sucesso !\n\nMerge realizado com sucesso.",
+        SUC008: "✅ Sucesso !\n\nMerge arvoré gerada."
     }
 };

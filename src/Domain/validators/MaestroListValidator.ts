@@ -8,7 +8,7 @@ import { MaestroRootEmptyError } from "../errors/MaestroRootEmptyError";
 export class MaestroListValidator implements IValidatorProcess {
     process(maestroList: IMaestroList): { success: boolean; message: string; } {
         if ("erro" in maestroList) { throw new MaestroListError(messagesV2.errors[ErrorCodes.MAESTRO_LIST_ERROR]); }
-        if (!maestroList.root.length) { throw new MaestroRootEmptyError(messagesV2.errors[ErrorCodes.MAESTRO_NOT_FOUND_ERROR]); }
+        if (!maestroList.root.length) { throw new MaestroRootEmptyError(messagesV2.errors[ErrorCodes.MAESTRO_ROOT_EMPTY_ERROR]); }
         return {
             success: true,
             message: messagesV2.success[SuccessCodes.SUCCESS_MAESTROS_FOUND]

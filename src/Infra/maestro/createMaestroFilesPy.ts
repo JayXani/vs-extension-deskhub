@@ -41,7 +41,7 @@ export const createMaestroFilesPy = async (basePath: string, maestroResponse: IM
     }
     maestroConfig.forEach((cfg) => configMap.set(cfg.name.replace("PARSE_", "").trim(), cfg));
     
-    createFiles(basePath, tree, configMap);
+    createFiles(fullPathMain, tree, configMap);
     return {
         success: true,
         message: "Pastas criadas com sucesso",

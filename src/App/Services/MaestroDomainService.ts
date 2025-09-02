@@ -6,7 +6,7 @@ import { IMaestroConfig } from "../../Domain/types/IMaestroConfig";
 import { IMaestroList, IMaestroResponse } from "../../Domain/types/IMaestroRequests";
 import { IDataList, IDataRequestKey } from "../../Domain/types/IDataRequest";
 import { decodeBase64 } from "../../Shared/helpers/decodeBase64";
-import { IMaestroFile } from "../../Domain/types/IMaestroFile";
+import { IMaestroFile, IMaestroTree } from "../../Domain/types/IMaestroFile";
 import { encodeBase64 } from "../../Shared/helpers/encondeBase64";
 import { flowBuilder } from "../../Infra/maestro/flowBuilder";
 import { MaestroFileChoose } from '../../Domain/types/MaestroFileChoose';
@@ -21,6 +21,7 @@ import { MaestroBase64Error } from '../../Domain/errors/MaestroBase64Error';
 import { MaestroValidatorService } from './MaestroValidatorService';
 import { IPrompts } from '../../Domain/types/IPrompts';
 import { MaestroListError } from '../../Domain/errors/MaestroListError';
+import { ExceptionGeneral } from '../../Domain/errors/ExceptionGeneral';
 
 
 export abstract class MaestroDomainService {
@@ -125,4 +126,25 @@ export abstract class MaestroDomainService {
         return maestroChoice;
     }
 
+    public convertFlowMaestro(flow: string) {
+        try {
+
+            const maestroFlowJson = JSON.parse(flow) as IMaestroFile;
+
+            // O flowBuilder irá pegar todo o conteúdo do maestro recebido via API, realizar o download alterar o conteúdo
+            // do parse que corresponder com o que está localmente, portanto, as alterações do VSCode permanecerão
+            // E o download só será realizado dos itens que estão no maestro.
+            const tree = maestroFlowJson.tree.split(";").map((v) => v.split("."));
+            if (typeof maestroFlowJson.config === "string") {
+                maestroFlowJson.config = JSON.parse(maestroFlowJson.config);
+            }
+            const maestroConfig = maestroFlowJson.config as IMaestroTree[];
+            return {
+                config: maestroConfig,
+                tree: tree,
+            };
+        } catch (e) {
+            throw new ExceptionGeneral("Erro ao decodificar o arquivo JSON");
+        }
+    }
 }
