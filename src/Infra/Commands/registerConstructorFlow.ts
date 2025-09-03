@@ -9,8 +9,8 @@ export function registerConstructorFlow(context: vscode.ExtensionContext) {
             return;
         }
 
-        const controller = new MaestroConstructorFlowController(vscode);
-        await controller.execute(workspaceFolder.uri.fsPath);
+        const controller = new MaestroConstructorFlowController();
+        await controller.execute(workspaceFolder.uri);
     });
 
     context.subscriptions.push(command);

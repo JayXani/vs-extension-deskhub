@@ -1,14 +1,9 @@
-import { getTreeHtml } from "../../Infra/maestro/getTreeHTML";
-import fs from 'fs';
-import * as path from 'path';
 import { showMessage } from "../../Shared/ui/showMessage";
-import { VSCodePrompts } from "../../Infra/prompts/VSCodePrompts";
 import { MaestroDomainService } from "./MaestroDomainService";
 import { messagesV2 } from "../../Shared/constants/messages-v2";
 import { SuccessCodes } from "../../Shared/constants/SuccessCodes";
 import { securityNonce } from "../../Shared/helpers/security";
 import { apiDeskManager } from "../../Infra/api/http-request";
-import { IMaestroFile } from "../../Domain/types/IMaestroFile";
 import { MaestroFileChoose } from "../../Domain/types/MaestroFileChoose";
 
 export class MaestroConstructorFlowService extends MaestroDomainService {
