@@ -2,7 +2,7 @@
   "name": "deskhub",
   "displayName": "deskhub",
   "description": "Extensao para versionamento de codigo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.101.0"
   },
@@ -10,7 +10,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+   ""
   ],
   "main": "./out/src/extension.js",
   "contributes": {
@@ -32,6 +32,10 @@
         "title": "Maestro: Combinar alterações"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JayXani/vs-extension-deskhub.git"
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
