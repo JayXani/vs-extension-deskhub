@@ -13,9 +13,6 @@
     "*"
   ],
   "main": "./out/src/extension.js",
-  "bin": {
-    "maestro": "./out/bin/maestro-commands.js"
-  },
   "contributes": {
     "commands": [
       {

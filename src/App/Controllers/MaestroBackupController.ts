@@ -4,7 +4,7 @@ import { showMessage } from '../../Shared/ui/showMessage';
 export class MaestroBackupController {
     private vscode: typeof import('vscode') | boolean;
 
-    constructor(vscode: typeof import('vscode') | boolean) {
+    constructor(vscode: typeof import('vscode')) {
         this.vscode = vscode;
     }
 
