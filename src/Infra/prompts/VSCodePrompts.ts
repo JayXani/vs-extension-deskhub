@@ -84,7 +84,7 @@ export class VSCodePrompts implements IPrompts {
                 message: "🔎 Informe a chave do ambiente que deseja:"
             }
         ]);
-        return publicKey;
+        return publicKey.replace('"', "");
     }
     async promptApiKey() {
         if (this.vscode) {
@@ -101,7 +101,7 @@ export class VSCodePrompts implements IPrompts {
                 message: "🔎 Informe a chave do operador:"
             }
         ]);
-        return apiKey;
+        return apiKey.replace('"', "");
     }
 
     //NÃO UTILIZADO, MANTER COMO TEMPLATE POR ENQUANTO
@@ -132,6 +132,6 @@ export class VSCodePrompts implements IPrompts {
                 ]
             }
         ]);
-        return confirmed;
+        return confirmed.replace('"', "");
     }
 }
