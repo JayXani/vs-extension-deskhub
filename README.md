@@ -10,9 +10,7 @@ Extensão do **Maestro** para o Visual Studio Code. Ela integra ações do Maest
 * **Padronizar o setup** de ambiente do projeto (estrutura básica, arquivos iniciais, etc.).
 * **Integrar com o ecossistema Maestro** (ex.: comandos, webviews e recursos internos da extensão).
 * **Evitar falhas comuns** ao configurar manualmente, centralizando a inicialização num comando único.
-
-> Observação: a extensão não substitui o CLI do Maestro; ela o **orquestra** sempre que aplicável.
-
+* 
 ---
 
 ## ⬇️ Passo a passo para baixar/instalar a extensão
@@ -55,9 +53,7 @@ code --install-extension <publisher>.<extension-id> --force
 
 1. Com o projeto aberto, abra a **Command Palette**: `Ctrl+Shift+P` (Windows/Linux) ou `Cmd+Shift+P` (macOS).
 2. Digite **Maestro** para filtrar os comandos da extensão.
-3. Escolha **"Maestro: Init"** para rodar a inicialização (`maestro --init`).
-
-Se o projeto exigir parâmetros adicionais, a extensão/CLI poderá solicitar interações.
+3. Escolha **"Maestro: Init"** para rodar a inicialização ().
 
 ---
 
@@ -67,33 +63,27 @@ Se o projeto exigir parâmetros adicionais, a extensão/CLI poderá solicitar in
 
 | Nome visível      | ID do comando  | O que faz                                                                        |
 | ----------------- | -------------- | -------------------------------------------------------------------------------- |
-| **Maestro: Init** | `maestro.init` | Executa a inicialização do projeto via Maestro (equivalente a `maestro --init`). |
+| **Maestro: Init** | `maestro.init` | Executa a inicialização do projeto via Maestro.                                  |
+| ----------------- | -------------- | -------------------------------------------------------------------------------- |
+| **Maestro: Upload** | `maestro.upload` | Executa o upload dos arquivos para o Maestro.                                |
+| ----------------- | -------------- | -------------------------------------------------------------------------------- |
+| **Maestro: Merge** | `maestro.merge` | Busca os arquivos python, diferentes, do Maestro.                              |
+| ----------------- | -------------- | -------------------------------------------------------------------------------- |
 
 > Observação: conforme a extensão evoluir, novos comandos podem ser adicionados. Mantenha esta tabela atualizada de acordo com os itens definidos no `contributes.commands` do `package.json`.
 
-### Linha de comando (CLI do Maestro — opcional)
-
-Se você utiliza o **CLI do Maestro** no seu ambiente, os comandos de terminal continuam funcionando normalmente fora do VS Code. Exemplo:
-
-```bash
-maestro --init
-```
-
-A extensão pode chamar o CLI por baixo dos panos, quando disponível, para manter uma experiência consistente entre terminal e editor.
-
----
 
 ## 🧩 Requisitos
 
-* **Usuário (para usar a extensão):** VS Code estável e acesso aos recursos do projeto. O CLI do Maestro é **opcional**, mas pode ser necessário em cenários específicos de inicialização.
-* **Desenvolvimento (para contribuir):** Node.js LTS, npm ou pnpm, TypeScript (se o projeto usar TS), e VS Code.
+* **Usuário (para usar a extensão):** VS Code estável e acesso aos recursos do projeto. O CLI do Maestro está **insdisponível**.
+* **Desenvolvimento (para contribuir):** Node.js LTS, npm ou pnpm, TypeScript e VS Code.
 
 ---
 
 ## ❓ Perguntas frequentes
 
-* **Preciso do CLI para usar a extensão?**
-  Não necessariamente. Porém, quando presente, o CLI é utilizado para garantir o mesmo comportamento do terminal.
+* **Posso rodar comandos CLI naextensão?**
+  Não, o objetivo da extensão é garantir a usabilidade somente no vscode, contudo, estamos com um projeto paralelo para providenciar a possibilidade dos comandos via npm.
 
 * **Quais permissões a extensão usa?**
   Apenas as necessárias para executar comandos e interagir com o workspace atual.
