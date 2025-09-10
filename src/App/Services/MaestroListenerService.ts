@@ -28,7 +28,7 @@ export class MaestroListenerService extends MaestroDomainService{
         for (const file of event.files) {
             const oldPath = file.oldUri.fsPath;
             const newPath = file.newUri.fsPath;
-
+            if (!oldPath.split(/[/\\]/).some((v) => v.includes("Maestro"))){ continue; }
             if (!oldPath.endsWith('.py') || !newPath.endsWith('.py')) { continue; }
 
             // Verifica se estão em uma pasta chamada "Maestro"
@@ -74,6 +74,7 @@ export class MaestroListenerService extends MaestroDomainService{
                 return formatErrorResponse(error);
             }
         }
+        return;
     }
 }
 

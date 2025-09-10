@@ -10,6 +10,7 @@ export class MaestroListenerController {
         try {
             const maestroListenerService = new MaestroListenerService(this.vscode, new VSCodePrompts(this.vscode));
             const result = await maestroListenerService.run(event);
+            if(!result){ return; }
             if ("error" in result) { return showMessage("error", result.error.message, this.vscode); }
             return showMessage("information", result.message, this.vscode);
         } catch (e) {

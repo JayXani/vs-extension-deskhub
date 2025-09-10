@@ -1,8 +1,8 @@
 {
   "name": "deskhub",
   "displayName": "deskhub",
-  "description": "Extensão para edição e versionamento de código para o maestro.",
-  "version": "0.0.1",
+  "description": "Extensao para versionamento de codigo",
+  "version": "0.1.4",
   "engines": {
     "vscode": "^1.101.0"
   },
@@ -10,12 +10,9 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+   ""
   ],
   "main": "./out/src/extension.js",
-  "bin": {
-    "maestro": "./out/bin/maestro-commands.js"
-  },
   "contributes": {
     "commands": [
       {
@@ -35,6 +32,15 @@
         "title": "Maestro: Combinar alterações"
       }
     ]
+  },
+  "icon": "assets/logo.png",
+  "files": [
+    "out/",
+    "assets/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JayXani/vs-extension-deskhub.git"
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
